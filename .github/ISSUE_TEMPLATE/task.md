@@ -1,7 +1,7 @@
 ---
 name: Task
 about: One task, doable in a single work session.
-title: ''
+title: "[TASK]"
 labels: ''
 assignees: abaddon-moriarty
 
