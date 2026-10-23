@@ -1,0 +1,50 @@
+default_install_hook_types: [pre-commit, pre-push]
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: "v6.0.0"   # rempli par `pre-commit autoupdate`
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-added-large-files
+      - id: detect-private-key
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: "v0.17.2"
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: https://github.com/sqlfluff/sqlfluff
+    rev: "4.4.0"
+    hooks:
+      - id: sqlfluff-lint
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: "v8.30.0"
+    hooks:
+      - id: gitleaks
+
+  - repo: local
+    hooks:
+      - id: no-personal-data
+        name: Refuse EPUB, KOReader and database files
+        language: fail
+        entry: "Ce fichier ne doit pas entrer dans le dépôt (données personnelles ou sous droits)"
+        files: '(^data/|\.epub$|\.sdr/|\.sqlite3$|\.duckdb$)'
+
+      - id: pytest
+        name: Run tests before push
+        language: system
+        entry: uv run pytest
+        pass_filenames: false
+        always_run: true
+        stages: [pre-push]
+
+      - id: no-absolute-paths
+        name: No hard-coded user paths
+        language: pygrep
+        entry: '/(home|run/media|Users)/'
