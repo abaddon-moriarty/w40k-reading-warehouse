@@ -219,27 +219,29 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# Epub 
+# Epub
 # epub files are not in the public domain
 *.epub
 
-# KOReader 
+# KOReader
 # files and folders are my own personal reading data
 .sdr/
 *.sdr
 
 # DuckDB
-*.duckdb
-*.duckdb.wal
+*.duckdb*
+
+#SQLite3
+*.sqlite3*
+
+# Entire data folder
+data/*
+
 
 # dbt
 target/
 dbt_packages/
 
-# Raw wiki data
-# Extracted and regenerated from wiki.gg API, not versioned
-data/raw/wiki_*.json
-data/raw/wiki_*.parquet
 
 # Logs
 logs/
