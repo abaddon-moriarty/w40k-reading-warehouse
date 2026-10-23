@@ -38,7 +38,9 @@ def load_raw(sqlite_path, warehouse_path):
         conn.execute(
             f'CREATE OR REPLACE TABLE warehouse.raw."{table}" AS SELECT * FROM statistics."{table}"'
         )
-        logging.info("Loaded raw.%s", table)
+        row_count = conn.execute(f'SELECT COUNT(*) FROM warehouse.raw."{table}"').fetchone()[0]
+
+        logging.info("Loaded raw.%s (%s rows)", table, row_count)
 
     conn.close()
 
