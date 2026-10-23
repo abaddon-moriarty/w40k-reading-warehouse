@@ -99,7 +99,7 @@ ipython_config.py
 #   Similar to Pipfile.lock, it is generally recommended to include uv.lock in version control.
 #   This is especially recommended for binary packages to ensure reproducibility, and is more
 #   commonly ignored for libraries.
-# uv.lock
+uv.lock
 
 # poetry
 #   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
@@ -218,3 +218,37 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Epub 
+# epub files are not in the public domain
+*.epub
+
+# KOReader 
+# files and folders are my own personal reading data
+.sdr/
+*.sdr
+
+# DuckDB
+*.duckdb
+*.duckdb.wal
+
+# dbt
+target/
+dbt_packages/
+
+# Raw wiki data
+# Extracted and regenerated from wiki.gg API, not versioned
+data/raw/wiki_*.json
+data/raw/wiki_*.parquet
+
+# Logs
+*.log
+logs/
+
+# Local development
+.envrc
+.direnv/
+
+# dbt artifacts (metadata)
+dbt_project.cache
+manifest.json
