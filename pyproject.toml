@@ -1,0 +1,24 @@
+[project]
+name = "w40k-reading-warehouse"
+version = "0.1.0"
+description = "Reading data warehouse: Warhammer 40k novels + KOReader stats → DuckDB → dbt. ELT pipeline, dimensional modeling, data quality. Learning project for modern data engineering practices."
+readme = "README.md"
+authors = [
+    { name = "abaddon-moriarty", email = "munaund@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "dbt>=2.0.9",
+    "duckdb>=2.0.0",
+]
+
+[project.scripts]
+w40k-reading-warehouse = "w40k_reading_warehouse:main"
+
+[build-system]
+requires = ["uv_build>=0.13.5,<0.14.0"]
+build-backend = "uv_build"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
