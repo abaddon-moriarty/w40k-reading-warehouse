@@ -9,6 +9,8 @@ load_dotenv(PROJECT_ROOT / ".env")
 DATA_DIR = PROJECT_ROOT / "data"
 RAW_DIR = DATA_DIR / "raw"
 WAREHOUSE_PATH = DATA_DIR / "warehouse.duckdb"
+KOREADER_PATH = os.environ.get("KOREADER")
+W40K_FOLDER = os.environ.get("W40K_FOLDER")
 
 
 def koreader_settings_dir() -> Path:
