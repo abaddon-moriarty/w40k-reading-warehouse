@@ -29,11 +29,11 @@ def finding_content_opf(zip_file: ZipFile):
             if element.tag.endswith("rootfile")
         ]
         if not full_path:
-            logging.warning("No rootfile found in container.xml of %s", {zip_file.filename})
+            logging.warning("No rootfile found in container.xml of %s", zip_file.filename)
             return None
         full_path = full_path[0]
         if full_path not in zip_file.namelist():
-            logging.warning("rootfile not found in container.xml, skipping")
+            logging.warning("%s not found in container.xml, skipping", full_path)
             return None
     return full_path
 
@@ -89,8 +89,7 @@ def reading_metadata_from_opf(unzipped_epub):
 
 
 def main():
-    logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
-
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
     if not W40K_FOLDER:
         logging.error("W40K_FOLDER is not configured")
         return
