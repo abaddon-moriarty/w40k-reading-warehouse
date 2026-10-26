@@ -4,7 +4,7 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 from zipfile import ZipFile
 
-from config import W40K_FOLDER
+from config import EREADER_ROOT, RAW_DIR, W40K_FOLDER
 
 OPF_NS = {
     "opf": "http://www.idpf.org/2007/opf",
@@ -53,7 +53,8 @@ def reading_metadata_from_opf(unzipped_epub):
             logging.warning("No metadata tags were found.")
             return []
 
-        filename = unzipped_epub.filename
+        filename = Path(unzipped_epub.filename).relative_to(EREADER_ROOT)
+        logging.debug("filename: %s", filename)
         rows = []
         for element in metadata.findall("*"):
             namespace, _, local_name = element.tag[1:].partition("}")
@@ -73,11 +74,11 @@ def reading_metadata_from_opf(unzipped_epub):
 
             rows.append(
                 {
-                    "file": filename,
+                    "file": str(filename),
                     "namespace": namespace,
                     "key": key,
                     "value": value,
-                    "attributes": attrs,
+                    "attributes": json.dumps(attrs),
                 }
             )
 
@@ -93,15 +94,26 @@ def main():
     if not W40K_FOLDER:
         logging.error("W40K_FOLDER is not configured")
         return
+    rows = []
+    output_path = RAW_DIR / "epub_metadata.jsonl"
 
     w40k_dir = Path(W40K_FOLDER)
     for epub_path in w40k_dir.rglob("*.epub"):
         # try:
         logging.debug(epub_path)
         with ZipFile(epub_path) as epub:
-            logging.debug(epub.filename)
-            _ = reading_metadata_from_opf(epub)
-        break
+            rows.extend(reading_metadata_from_opf(epub))
+    with output_path.open("w", encoding="utf-8") as f:
+        for row in rows:
+            f.write(json.dumps(row, ensure_ascii=False) + "\n")
+    logging.info(
+        "Wrote %d rows for %d files to %s",
+        len(rows),
+        len({r["file"] for r in rows}),
+        output_path,
+    )
+
+    return rows
 
 
 if __name__ == "__main__":
