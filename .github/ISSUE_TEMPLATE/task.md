@@ -12,6 +12,7 @@ assignees: abaddon-moriarty
 
  ## Done when
  <!-- Checkable: a table exists, a test passes, a number is recorded. -->
+- [ ] Branch passes the [clean clone check](../../README.md#checking-a-branch-from-a-clean-clone)
 
 ## Notes
 <!-- Optional: lead, link, decision taken along the way. -->

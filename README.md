@@ -77,6 +77,21 @@ duckdb data/warehouse.duckdb -markdown -c ".read analyses/epub_title_check.sql"
 
 Both extract scripts only read from the e-reader: the KOReader database is opened read-only and copied before loading, and EPUB files are opened as archives without being modified. Running a script twice gives the same result (`CREATE OR REPLACE` on every raw table).
 
+### Checking a branch from a clean clone
+
+Before opening a pull request, check that the pushed branch works on a fresh copy: no `data/` folder, no local leftovers. Push first, since the clone only sees what is on GitHub. Run from the root of your working copy, which supplies the branch name and the `.env`:
+
+```bash
+deactivate 2>/dev/null || true   # otherwise uv warns that VIRTUAL_ENV points to the main project's .venv
+REPO=$(pwd) BRANCH=$(git branch --show-current)
+rm -rf /tmp/check && cd /tmp
+git clone -b "$BRANCH" https://github.com/abaddon-moriarty/w40k-reading-warehouse.git check
+cd check && uv sync && cp "$REPO/.env" .env
+uv run python -m extract.book_list && uv run pytest
+```
+
+The `rm -rf` matters: without it, `git clone` refuses to overwrite an existing `/tmp/check` and the remaining commands run silently against the old copy.
+
 ## Project layout
 
 ```
