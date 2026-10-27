@@ -1,37 +1,48 @@
 import sqlite3
 
-from extract.copy_database import copy_data_db, load_raw
+import pytest
+
+from extract.copy_database import run
+
+PIPELINES = [
+    pytest.param(run, "fake_koreader_db", "raw", id="koreader_stats"),
+    # pytest.param(vocabulary.run, "fake_vocab_db", "raw_vocabulary", id="vocabulary"),
+]
 
 
-def run_pipeline(source, tmp_path):
-    raw_copy = tmp_path / "koreader_db.sqlite3"
+@pytest.mark.parametrize("pipeline, source_fixture, schema", PIPELINES)
+def test_pipeline_is_idempotent(pipeline, source_fixture, schema, request, tmp_path, snapshot):
+    source = request.getfixturevalue(source_fixture)
     warehouse = tmp_path / "warehouse.duckdb"
-    copy_data_db(source, raw_copy)
-    load_raw(raw_copy, warehouse)
-    return warehouse
+
+    pipeline(source, tmp_path, warehouse)
+    first = snapshot(warehouse, schema)
+
+    pipeline(source, tmp_path, warehouse)
+
+    assert snapshot(warehouse, schema) == first
 
 
-def test_running_twice_gives_the_same_state(fake_koreader_db, tmp_path, snapshot):
-    warehouse = run_pipeline(fake_koreader_db, tmp_path)
-    first = snapshot(warehouse)
+def test_load_keeps_every_row(fake_koreader_db, tmp_path, snapshot):
+    warehouse = tmp_path / "warehouse.duckdb"
 
-    run_pipeline(fake_koreader_db, tmp_path)
-    second = snapshot(warehouse)
+    run(fake_koreader_db, tmp_path, warehouse)
+    state = snapshot(warehouse)
 
-    assert second == first
-    assert len(first["book"]) == 2
-    assert len(first["page_stat_data"]) == 3
+    assert len(state["book"]) == 2
+    assert len(state["page_stat_data"]) == 3
 
 
 def test_rerun_reflects_source_exactly(fake_koreader_db, tmp_path, snapshot):
     """A table that disappears from the source should disappear from raw too."""
-    warehouse = run_pipeline(fake_koreader_db, tmp_path)
+    warehouse = tmp_path / "warehouse.duckdb"
+    run(fake_koreader_db, tmp_path, warehouse)
 
     conn = sqlite3.connect(fake_koreader_db)
     conn.execute("DROP TABLE page_stat_data")
     conn.commit()
     conn.close()
 
-    run_pipeline(fake_koreader_db, tmp_path)
+    run(fake_koreader_db, tmp_path, warehouse)
 
     assert "page_stat_data" not in snapshot(warehouse)
