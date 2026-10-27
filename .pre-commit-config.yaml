@@ -48,3 +48,9 @@ repos:
         name: No hard-coded user paths
         language: pygrep
         entry: '/(home|run/media|Users)/'
+
+      - id: no-ereader-paths
+        name: No e-reader file names or folders
+        language: pygrep
+        entry: '(?i)(\w\.k?epub\b|\bbooks/)'
+        exclude: '^\.pre-commit-config\.yaml$'
