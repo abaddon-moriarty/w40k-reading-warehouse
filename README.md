@@ -26,7 +26,7 @@ EPUB tables of contents ───────┘
 
 | Source | Extract script | Raw file | Raw table(s) | Status |
 |---|---|---|---|---|
-| KOReader reading statistics | `extract/copy_database.py` | `data/raw/koreader_db.sqlite3` | `raw.book`, `raw.page_stat_data`, `raw.numbers`, `raw.sqlite_sequence` | Done |
+| KOReader reading statistics | `extract/copy_database.py` | `data/raw/koreader_db.sqlite3` | `raw_koreader.book`, `raw_koreader.page_stat_data`, `raw_koreader.numbers`, `raw_koreader.sqlite_sequence` | Done |
 | EPUB metadata (OPF) | `extract/book_list.py` | `data/raw/epub_metadata.jsonl` | `raw.epub_metadata` | Done |
 | Wiki categories and redirects | *(to do)* | | | To do |
 | EPUB tables of contents | *(to do)* | | | V2 |
@@ -63,7 +63,7 @@ find /path/to/ereader -name statistics.sqlite3
 ## Usage
 
 ```bash
-uv run python -m extract.copy_database   # copy the KOReader database and load it into raw
+uv run python -m extract.copy_database   # copy the KOReader database and load it into raw_koreader
 uv run python -m extract.book_list       # read the metadata of every EPUB and load it into raw.epub_metadata
 uv run pytest                            # run the tests
 duckdb -ui data/warehouse.duckdb         # explore the warehouse in the browser
@@ -75,7 +75,7 @@ Run an analysis and get the result as a Markdown table:
 duckdb data/warehouse.duckdb -markdown -c ".read analyses/epub_title_check.sql"
 ```
 
-Both extract scripts only read from the e-reader: the KOReader database is opened read-only and copied before loading, and EPUB files are opened as archives without being modified. Running a script twice gives the same result (`CREATE OR REPLACE` on every raw table).
+Both extract scripts only read from the e-reader: the KOReader database is opened read-only and copied before loading, and EPUB files are opened as archives without being modified. Running a script twice gives the same result: `copy_database.py` drops and rebuilds the `raw_koreader` schema in a single transaction, so it always mirrors the source database (a table removed from the source disappears too), and `book_list.py` replaces `raw.epub_metadata` with `CREATE OR REPLACE`.
 
 ### Checking a branch from a clean clone
 
