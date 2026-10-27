@@ -16,6 +16,3 @@ assignees: abaddon-moriarty
 
 ## Notes
 <!-- Optional: lead, link, decision taken along the way. -->
-
-
-Puis « Propose changes » : GitHub commite le fichier .github/ISSUE_TEMPLATE/task.md pour toi.

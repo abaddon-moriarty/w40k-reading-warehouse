@@ -1,5 +1,6 @@
 import json
 import logging
+import sys
 from pathlib import Path
 from xml.etree import ElementTree as ET
 from zipfile import BadZipFile, ZipFile
@@ -114,12 +115,12 @@ def write_jsonl(rows, path):
 def upload_metadata_to_warehouse(output_path):
     conn = duckdb.connect(str(WAREHOUSE_PATH), config={"storage_compatibility_version": "v1.5.0"})
 
-    conn.execute("CREATE SCHEMA IF NOT EXISTS warehouse.raw")
+    conn.execute("CREATE SCHEMA IF NOT EXISTS raw")
     conn.execute(
-        f"""CREATE OR REPLACE TABLE warehouse.raw.epub_metadata AS
+        f"""CREATE OR REPLACE TABLE raw.epub_metadata AS
             SELECT * FROM read_json('{output_path}');"""
     )
-    row_count = conn.execute("SELECT COUNT(*) FROM warehouse.raw.epub_metadata").fetchone()[0]
+    row_count = conn.execute("SELECT COUNT(*) FROM raw.epub_metadata").fetchone()[0]
     logging.info("Loaded raw.epub_metadata (%s rows)", row_count)
 
     conn.close()
@@ -129,14 +130,14 @@ def main():
     logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
     if not W40K_FOLDER:
         logging.error("W40K_FOLDER is not configured")
-        return
+        return 1
     if not EREADER_ROOT:
         logging.error("EREADER_ROOT is not configured")
-        return
+        return 1
     w40k_dir = Path(W40K_FOLDER)
     if not w40k_dir.is_relative_to(EREADER_ROOT):
         logging.error("W40K_FOLDER must be inside EREADER_ROOT")
-        return
+        return 1
 
     rows = []
     output_path = RAW_DIR / "epub_metadata.jsonl"
@@ -151,7 +152,8 @@ def main():
 
     write_jsonl(rows, output_path)
     upload_metadata_to_warehouse(output_path)
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

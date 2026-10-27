@@ -1,5 +1,6 @@
 import logging
 import sqlite3
+import sys
 
 import duckdb
 
@@ -19,13 +20,12 @@ def copy_data_db(source_path, raw_output_path):
     dst.close()
 
 
-def load_raw(sqlite_path, warehouse_path):
+def load_raw(sqlite_path, warehouse_path, schema="raw_koreader"):
     conn = duckdb.connect(str(warehouse_path), config={"storage_compatibility_version": "v1.5.0"})
 
     conn.execute("INSTALL AND LOAD sqlite;")
     conn.execute(f"ATTACH '{sqlite_path}' AS statistics (TYPE sqlite, READ_ONLY);")
 
-    conn.execute("CREATE SCHEMA IF NOT EXISTS warehouse.raw")
     tables = conn.execute(
         """
         SELECT table_name FROM information_schema.tables
@@ -34,15 +34,26 @@ def load_raw(sqlite_path, warehouse_path):
         """
     ).fetchall()
 
-    for (table,) in tables:
-        conn.execute(
-            f'CREATE OR REPLACE TABLE warehouse.raw."{table}" AS SELECT * FROM statistics."{table}"'
-        )
-        row_count = conn.execute(f'SELECT COUNT(*) FROM warehouse.raw."{table}"').fetchone()[0]
+    conn.execute("BEGIN TRANSACTION")
+    try:
+        conn.execute(f"DROP SCHEMA IF EXISTS {schema} CASCADE")
+        conn.execute(f"CREATE SCHEMA {schema}")
+        for (table,) in tables:
+            conn.execute(f'CREATE TABLE {schema}."{table}" AS SELECT * FROM statistics."{table}"')
+            row_count = conn.execute(f'SELECT COUNT(*) FROM {schema}."{table}"').fetchone()[0]
+            logging.info("Loaded %s.%s (%s rows)", schema, table, row_count)
+        conn.execute("COMMIT")
+    except Exception:
+        conn.execute("ROLLBACK")
+        raise
+    finally:
+        conn.close()
 
-        logging.info("Loaded raw.%s (%s rows)", table, row_count)
 
-    conn.close()
+def run(source, raw_dir, warehouse_path):
+    raw_copy = raw_dir / "koreader_db.sqlite3"
+    copy_data_db(source, raw_copy)
+    load_raw(raw_copy, warehouse_path, schema="raw_koreader")
 
 
 def main():
@@ -51,13 +62,8 @@ def main():
     try:
         source_path = koreader_settings_dir() / "statistics.sqlite3"
         source_path.resolve(strict=True)
-
-        sqlite_dest_path = RAW_DIR / "koreader_db.sqlite3"
-
         logging.info(source_path)
-        copy_data_db(source_path, sqlite_dest_path)
-
-        load_raw(sqlite_dest_path, WAREHOUSE_PATH)
+        run(source_path, RAW_DIR, WAREHOUSE_PATH)
 
     except FileNotFoundError:
         logging.exception(
@@ -65,9 +71,12 @@ def main():
             Make sure the eReader is plugged in and,
             the KOREADER_SETTINGS_DIR in your .env is correct."""
         )
+        return 1
     except OSError:
         logging.exception("An OS error occurred (e.g., permission denied).")
+        return 1
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
