@@ -45,7 +45,7 @@ def load_raw(sqlite_path, warehouse_path, schema="raw"):
             row_count = conn.execute(
                 f'SELECT COUNT(*) FROM warehouse.{schema}."{table}"'
             ).fetchone()[0]
-            logging.info("Loaded raw.%s (%s rows)", table, row_count)
+            logging.info("Loaded %s.%s (%s rows)", schema, table, row_count)
         conn.execute("COMMIT")
     except Exception:
         conn.execute("ROLLBACK")
@@ -54,19 +54,21 @@ def load_raw(sqlite_path, warehouse_path, schema="raw"):
         conn.close()
 
 
+def run(source, raw_dir, warehouse_path):
+    raw_copy = raw_dir / "koreader_db.sqlite3"
+    copy_data_db(source, raw_copy)
+    load_raw(raw_copy, warehouse_path)
+    return warehouse_path
+
+
 def main():
     logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
 
     try:
         source_path = koreader_settings_dir() / "statistics.sqlite3"
         source_path.resolve(strict=True)
-
-        sqlite_dest_path = RAW_DIR / "koreader_db.sqlite3"
-
         logging.info(source_path)
-        copy_data_db(source_path, sqlite_dest_path)
-
-        load_raw(sqlite_dest_path, WAREHOUSE_PATH)
+        run(source_path, RAW_DIR, WAREHOUSE_PATH)
 
     except FileNotFoundError:
         logging.exception(
