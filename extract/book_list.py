@@ -4,7 +4,8 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 from zipfile import ZipFile
 
-from config import EREADER_ROOT, RAW_DIR, W40K_FOLDER
+import duckdb
+from config import EREADER_ROOT, RAW_DIR, W40K_FOLDER, WAREHOUSE_PATH
 
 OPF_NS = {
     "opf": "http://www.idpf.org/2007/opf",
@@ -89,6 +90,20 @@ def reading_metadata_from_opf(unzipped_epub):
         return []
 
 
+def upload_metadata_to_warehouse(output_path):
+    conn = duckdb.connect(str(WAREHOUSE_PATH), config={"storage_compatibility_version": "v1.5.0"})
+
+    conn.execute("CREATE SCHEMA IF NOT EXISTS warehouse.raw")
+    conn.execute(
+        f"""CREATE OR REPLACE TABLE warehouse.raw.epub_metadata AS
+            SELECT * FROM read_json('{output_path}');"""
+    )
+    row_count = conn.execute("SELECT COUNT(*) FROM warehouse.raw.epub_metadata").fetchone()[0]
+    logging.info("Loaded raw.epub_metadata (%s rows)", row_count)
+
+    conn.close()
+
+
 def main():
     logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
     if not W40K_FOLDER:
@@ -113,7 +128,7 @@ def main():
         output_path,
     )
 
-    return rows
+    upload_metadata_to_warehouse(output_path)
 
 
 if __name__ == "__main__":

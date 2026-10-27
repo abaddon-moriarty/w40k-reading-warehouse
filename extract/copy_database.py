@@ -20,7 +20,7 @@ def copy_data_db(raw_copy_path, raw_output_path):
 
 
 def load_raw(sqlite_path, warehouse_path):
-    conn = duckdb.connect(str(warehouse_path))
+    conn = duckdb.connect(str(warehouse_path), config={"storage_compatibility_version": "v1.5.0"})
 
     conn.execute("INSTALL AND LOAD sqlite;")
     conn.execute(f"ATTACH '{sqlite_path}' AS statistics (TYPE sqlite, READ_ONLY);")
