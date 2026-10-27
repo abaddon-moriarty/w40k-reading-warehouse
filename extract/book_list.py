@@ -1,5 +1,6 @@
 import json
 import logging
+import sys
 from pathlib import Path
 from xml.etree import ElementTree as ET
 from zipfile import BadZipFile, ZipFile
@@ -129,14 +130,14 @@ def main():
     logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
     if not W40K_FOLDER:
         logging.error("W40K_FOLDER is not configured")
-        return
+        return 1
     if not EREADER_ROOT:
         logging.error("EREADER_ROOT is not configured")
-        return
+        return 1
     w40k_dir = Path(W40K_FOLDER)
     if not w40k_dir.is_relative_to(EREADER_ROOT):
         logging.error("W40K_FOLDER must be inside EREADER_ROOT")
-        return
+        return 1
 
     rows = []
     output_path = RAW_DIR / "epub_metadata.jsonl"
@@ -151,7 +152,8 @@ def main():
 
     write_jsonl(rows, output_path)
     upload_metadata_to_warehouse(output_path)
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

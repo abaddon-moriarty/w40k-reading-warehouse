@@ -90,7 +90,6 @@ cd check && uv sync && cp "$REPO/.env" .env
 uv run python -m extract.book_list && uv run pytest
 ```
 
-The `rm -rf` matters: without it, `git clone` refuses to overwrite an existing `/tmp/check` and the remaining commands run silently against the old copy.
 
 ## Project layout
 

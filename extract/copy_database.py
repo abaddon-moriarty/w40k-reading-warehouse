@@ -1,5 +1,6 @@
 import logging
 import sqlite3
+import sys
 
 import duckdb
 
@@ -70,9 +71,12 @@ def main():
             Make sure the eReader is plugged in and,
             the KOREADER_SETTINGS_DIR in your .env is correct."""
         )
+        return 1
     except OSError:
         logging.exception("An OS error occurred (e.g., permission denied).")
+        return 1
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
