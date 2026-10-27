@@ -35,17 +35,15 @@ def load_raw(sqlite_path, warehouse_path, schema="raw"):
 
     conn.execute("BEGIN TRANSACTION")
     try:
-        conn.execute(f"DROP SCHEMA IF EXISTS warehouse.{schema} CASCADE")
-        conn.execute(f"CREATE SCHEMA warehouse.{schema}")
+        conn.execute(f"DROP SCHEMA IF EXISTS {schema} CASCADE")
+        conn.execute(f"CREATE SCHEMA {schema}")
         for (table,) in tables:
             conn.execute(
                 f'''
-                CREATE OR REPLACE TABLE warehouse.{schema}."{table}"
+                CREATE OR REPLACE TABLE {schema}."{table}"
                 AS SELECT * FROM statistics."{table}"'''
             )
-            row_count = conn.execute(
-                f'SELECT COUNT(*) FROM warehouse.{schema}."{table}"'
-            ).fetchone()[0]
+            row_count = conn.execute(f'SELECT COUNT(*) FROM {schema}."{table}"').fetchone()[0]
             logging.info("Loaded %s.%s (%s rows)", schema, table, row_count)
         conn.execute("COMMIT")
     except Exception:

@@ -58,3 +58,9 @@ def test_load_does_not_touch_other_sources(fake_koreader_db, tmp_path, snapshot)
     conn.close()
     run(fake_koreader_db, tmp_path, warehouse)
     assert snapshot(warehouse)["epub_metadata"] == [(1, "Fake EPUB")]
+
+
+def test_different_base_name_accepted(fake_koreader_db, tmp_path, snapshot):
+    warehouse = tmp_path / "other.duckdb"
+    run(fake_koreader_db, tmp_path, warehouse)
+    assert "book" in snapshot(warehouse, "raw_koreader")
