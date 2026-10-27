@@ -6,8 +6,8 @@ import duckdb
 from extract.config import RAW_DIR, WAREHOUSE_PATH, koreader_settings_dir
 
 
-def copy_data_db(raw_copy_path, raw_output_path):
-    src = sqlite3.connect(f"file:{raw_copy_path}?mode=ro", uri=True)
+def copy_data_db(source_path, raw_output_path):
+    src = sqlite3.connect(f"file:{source_path}?mode=ro", uri=True)
 
     dst = sqlite3.connect(raw_output_path)
 
@@ -49,13 +49,13 @@ def main():
     logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
 
     try:
-        raw_copy_path = koreader_settings_dir() / "statistics.sqlite3"
-        raw_copy_path.resolve(strict=True)
+        source_path = koreader_settings_dir() / "statistics.sqlite3"
+        source_path.resolve(strict=True)
 
         sqlite_dest_path = RAW_DIR / "koreader_db.sqlite3"
 
-        logging.info(raw_copy_path)
-        copy_data_db(raw_copy_path, sqlite_dest_path)
+        logging.info(source_path)
+        copy_data_db(source_path, sqlite_dest_path)
 
         load_raw(sqlite_dest_path, WAREHOUSE_PATH)
 

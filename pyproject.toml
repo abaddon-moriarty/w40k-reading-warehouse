@@ -13,16 +13,8 @@ dependencies = [
     "python-dotenv>=1.2.4",
 ]
 
-[project.scripts]
-w40k-reading-warehouse = "w40k_reading_warehouse:main"
-
-[build-system]
-requires = ["uv_build>=0.13.5,<0.14.0"]
-build-backend = "uv_build"
-
 [tool.ruff]
 line-length = 100
-target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "PTH", "T20"]

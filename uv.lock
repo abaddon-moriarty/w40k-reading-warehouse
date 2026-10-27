@@ -573,7 +573,7 @@ wheels = [
 [[package]]
 name = "w40k-reading-warehouse"
 version = "0.1.0"
-source = { editable = "." }
+source = { virtual = "." }
 dependencies = [
     { name = "dbt" },
     { name = "duckdb" },
