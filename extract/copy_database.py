@@ -19,13 +19,12 @@ def copy_data_db(source_path, raw_output_path):
     dst.close()
 
 
-def load_raw(sqlite_path, warehouse_path):
+def load_raw(sqlite_path, warehouse_path, schema="raw"):
     conn = duckdb.connect(str(warehouse_path), config={"storage_compatibility_version": "v1.5.0"})
 
     conn.execute("INSTALL AND LOAD sqlite;")
     conn.execute(f"ATTACH '{sqlite_path}' AS statistics (TYPE sqlite, READ_ONLY);")
 
-    conn.execute("CREATE SCHEMA IF NOT EXISTS warehouse.raw")
     tables = conn.execute(
         """
         SELECT table_name FROM information_schema.tables
@@ -34,15 +33,25 @@ def load_raw(sqlite_path, warehouse_path):
         """
     ).fetchall()
 
-    for (table,) in tables:
-        conn.execute(
-            f'CREATE OR REPLACE TABLE warehouse.raw."{table}" AS SELECT * FROM statistics."{table}"'
-        )
-        row_count = conn.execute(f'SELECT COUNT(*) FROM warehouse.raw."{table}"').fetchone()[0]
-
-        logging.info("Loaded raw.%s (%s rows)", table, row_count)
-
-    conn.close()
+    conn.execute("BEGIN TRANSACTION")
+    try:
+        conn.execute(f"DROP SCHEMA IF EXISTS warehouse.{schema} CASCADE")
+        conn.execute(f"CREATE SCHEMA warehouse.{schema}")
+        for (table,) in tables:
+            conn.execute(
+                f'CREATE OR REPLACE TABLE warehouse.{schema}."{table}" \
+                    AS SELECT * FROM statistics."{table}"'
+            )
+            row_count = conn.execute(
+                f'SELECT COUNT(*) FROM warehouse.{schema}."{table}"'
+            ).fetchone()[0]
+            logging.info("Loaded raw.%s (%s rows)", table, row_count)
+        conn.execute("COMMIT")
+    except Exception:
+        conn.execute("ROLLBACK")
+        raise
+    finally:
+        conn.close()
 
 
 def main():
