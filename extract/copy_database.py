@@ -39,8 +39,9 @@ def load_raw(sqlite_path, warehouse_path, schema="raw"):
         conn.execute(f"CREATE SCHEMA warehouse.{schema}")
         for (table,) in tables:
             conn.execute(
-                f'CREATE OR REPLACE TABLE warehouse.{schema}."{table}" \
-                    AS SELECT * FROM statistics."{table}"'
+                f'''
+                CREATE OR REPLACE TABLE warehouse.{schema}."{table}"
+                AS SELECT * FROM statistics."{table}"'''
             )
             row_count = conn.execute(
                 f'SELECT COUNT(*) FROM warehouse.{schema}."{table}"'
@@ -57,7 +58,7 @@ def load_raw(sqlite_path, warehouse_path, schema="raw"):
 def run(source, raw_dir, warehouse_path):
     raw_copy = raw_dir / "koreader_db.sqlite3"
     copy_data_db(source, raw_copy)
-    load_raw(raw_copy, warehouse_path)
+    load_raw(raw_copy, warehouse_path, schema="raw_koreader")
     return warehouse_path
 
 
