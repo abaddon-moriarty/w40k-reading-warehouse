@@ -13,25 +13,25 @@ dependencies = [
     "python-dotenv>=1.2.4",
 ]
 
-[project.scripts]
-w40k-reading-warehouse = "w40k_reading_warehouse:main"
-
-[build-system]
-requires = ["uv_build>=0.13.5,<0.14.0"]
-build-backend = "uv_build"
-
 [tool.ruff]
 line-length = 100
-target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "PTH", "T20"]
+
+[tool.sqlfluff.core]
+dialect = "duckdb"
+max_line_length = 100
+
+[tool.sqlfluff.indentation]
+tab_space_size = 2
 
 
 [dependency-groups]
 dev = [
     "pre-commit>=4.7.0",
     "pytest>=9.1.1",
+    "sqlfluff==4.4.0",
 ]
 
 [tool.pytest.ini_options]
