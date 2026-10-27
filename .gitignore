@@ -248,3 +248,5 @@ logs/
 
 # Local development
 .direnv/
+
+.vscode/
