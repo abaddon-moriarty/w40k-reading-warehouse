@@ -19,7 +19,7 @@ def copy_data_db(source_path, raw_output_path):
     dst.close()
 
 
-def load_raw(sqlite_path, warehouse_path, schema="raw"):
+def load_raw(sqlite_path, warehouse_path, schema="raw_koreader"):
     conn = duckdb.connect(str(warehouse_path), config={"storage_compatibility_version": "v1.5.0"})
 
     conn.execute("INSTALL AND LOAD sqlite;")
@@ -38,11 +38,7 @@ def load_raw(sqlite_path, warehouse_path, schema="raw"):
         conn.execute(f"DROP SCHEMA IF EXISTS {schema} CASCADE")
         conn.execute(f"CREATE SCHEMA {schema}")
         for (table,) in tables:
-            conn.execute(
-                f'''
-                CREATE OR REPLACE TABLE {schema}."{table}"
-                AS SELECT * FROM statistics."{table}"'''
-            )
+            conn.execute(f'CREATE TABLE {schema}."{table}" AS SELECT * FROM statistics."{table}"')
             row_count = conn.execute(f'SELECT COUNT(*) FROM {schema}."{table}"').fetchone()[0]
             logging.info("Loaded %s.%s (%s rows)", schema, table, row_count)
         conn.execute("COMMIT")
@@ -57,7 +53,6 @@ def run(source, raw_dir, warehouse_path):
     raw_copy = raw_dir / "koreader_db.sqlite3"
     copy_data_db(source, raw_copy)
     load_raw(raw_copy, warehouse_path, schema="raw_koreader")
-    return warehouse_path
 
 
 def main():
