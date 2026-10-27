@@ -31,11 +31,15 @@ select = ["E", "F", "I", "B", "UP", "PTH", "T20"]
 dialect = "duckdb"
 max_line_length = 100
 
+[tool.sqlfluff.indentation]
+tab_space_size = 2
+
 
 [dependency-groups]
 dev = [
     "pre-commit>=4.7.0",
     "pytest>=9.1.1",
+    "sqlfluff==4.4.0",
 ]
 
 [tool.pytest.ini_options]
