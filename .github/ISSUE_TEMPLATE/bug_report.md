@@ -1,38 +1,20 @@
 ---
 name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: ''
+about: Something produces a wrong result or crashes
+title: "[BUG]"
+labels: type:bug
+assignees: abaddon-moriarty
+type: Bug
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+## What happens
+<!-- Command run, error or wrong number observed -->
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+## What should happen
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+## How to reproduce
+<!-- Smallest steps, from a clean clone if possible -->
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
-
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
-
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
-
-**Additional context**
-Add any other context about the problem here.
+## Done when
+- [ ] Fixed, and a test or a check prevents it from coming back

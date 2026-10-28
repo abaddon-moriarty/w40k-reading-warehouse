@@ -4,6 +4,7 @@ about: One task, doable in a single work session.
 title: "[TASK]"
 labels: ''
 assignees: abaddon-moriarty
+type: Task
 
 ---
 
