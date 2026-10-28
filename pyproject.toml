@@ -3,6 +3,7 @@ name = "w40k-reading-warehouse"
 version = "0.1.0"
 description = "Reading data warehouse: Warhammer 40k novels + KOReader stats → DuckDB → dbt. ELT pipeline, dimensional modeling, data quality. Learning project for modern data engineering practices."
 readme = "README.md"
+license = "MIT"
 authors = [
     { name = "abaddon-moriarty", email = "munaund@gmail.com" }
 ]

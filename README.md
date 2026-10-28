@@ -138,8 +138,19 @@ The full list, with the planned fix for each, is kept in the project tracking do
 
 ## Data and licences
 
-- No data is distributed with this repository. Reading statistics and book files stay on my machine.
-- Wiki data from [warhammer40k.wiki.gg](https://warhammer40k.wiki.gg/) is under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/). Other sources: licences to be checked (Compliance milestone).
-- Code licence: [MIT or Apache 2.0, to be chosen].
+**Code:** [MIT](LICENSE). The licence covers the code only; data from third-party sources keeps its own licence.
+
+**Data:** no data is distributed with this repository. Reading statistics, book files and wiki extracts stay locally (`data/` is ignored by Git).
+
+| Source | Licence | Automated access | Use in this project |
+|---|---|---|---|
+| KOReader statistics, EPUB files | Personal data / copyrighted books | Local files | Read locally, never committed |
+| [Warhammer 40k Lexicanum](https://wh40k.lexicanum.com) | CC BY-NC (default licence of Lexicanum sites) | Allowed by robots.txt, 5 s between requests | Candidate source for the entity lexicon |
+| [Warhammer 40k Wiki (wiki.gg)](https://warhammer40k.wiki.gg) | [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) | `api.php` disallowed by robots.txt | Sitemap and manual exports only |
+| [Warhammer 40k Wiki (Fandom)](https://warhammer40k.fandom.com) | CC BY-SA | Allowed by robots.txt | Evaluated, not used in v0.1 |
+
+Licences and access rules checked on 28/10/2026; details in [`docs/sources/`](docs/sources/).
+
+This project uses material from the Warhammer 40k Lexicanum (https://wh40k.lexicanum.com), licensed under the Creative Commons Attribution-NonCommercial License.
 
 *This is an unofficial fan project, not endorsed by Games Workshop. Warhammer 40,000 is a trademark of Games Workshop Ltd.*
