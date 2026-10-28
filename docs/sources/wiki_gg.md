@@ -51,7 +51,7 @@
 |---|---|
 | Mode d'accès retenu (v0.1) | **Sans accès automatisé à l'API.** Titres des pages : sitemap (téléchargement ponctuel, autorisé). Catégories et types : `Special:Export` par catégorie, à la main dans le navigateur, si disponible. Les fichiers obtenus sont rangés dans `data/raw/` et lus en local |
 | Robots.txt (vérifié le 28/10/2026) | Bloc wiki.gg : `Disallow` sur `/api.php`, `/index.php`, `/rest.php`, `/wiki/Special:`, `/wiki/User:`, et sur les paramètres `?action=`, `?pagefrom=`, `?limit=`… Bloc Cloudflare : `Allow: /` avec le signal de contenu `search=yes, ai-train=no, use=reference`, présenté comme réserve de droits (article 4, directive UE 2019/790). Avertissement : accès restreint en cas de trafic automatisé abusif |
-| Demande d'autorisation | À envoyer aux administrateurs, pour une extraction ponctuelle via l'API (volume, User-Agent identifiable, requêtes une par une). Date d'envoi : [à compléter] |
+| Demande d'autorisation | À envoyer aux administrateurs, pour une extraction ponctuelle via l'API (volume, User-Agent identifiable, requêtes une par une). Date d'envoi : non envoyée |
 | Fréquence de mise à jour | Continue (éditions communautaires) |
 | Fraîcheur | `lastmod` par page dans le sitemap (dernière modification observée : 27/10/2026) |
 | Volumétrie au 28/10/2026 | 117 926 pages tous espaces de noms confondus, 856 486 éditions depuis la création (Special:Statistics) ; au moins 50 000 pages dans l'espace principal (sitemap) |
@@ -69,12 +69,11 @@
 ## 7. Qualité
 | Champ | Valeur |
 |---|---|
-| Complétude | Wiki récent (en construction). La complétude est probablement inférieure à Lexicanum (qui revendique ~34 000 articles) et au wiki Fandom, mais la qualité éditoriale se veut supérieure (équipe expérimentée). |
+| Complétude | Au moins 50 000 pages de contenu (premier fichier du sitemap, plafonné à 50 000 URL ; 117 926 pages tous espaces de noms confondus d'après Special:Statistics, 28/10/2026). Ce chiffre inclut des pages qui ne sont pas des entités : sur ces 50 000, 6 807 titres ont une précision entre parenthèses, dont 1 247 pages de désambiguïsation, 802 nouvelles et 484 romans. Ordre de grandeur comparable à Lexicanum (50 220 articles, `meta=siteinfo`, 28/10/2026). Sondage sur ma bibliothèque : personnages principaux présents (Ciaphas Cain, Amberley Vail, Gregor Eisenhorn, Gideon Ravenor, Alizebeth Bequin, Uriel Ventris, Valhallan 597th) ; noms courts absents (« Cain », « Eisenhorn », « Jurgen »), probablement parce que les redirections ne figurent pas dans le sitemap. Part des entités de mes livres présentes : à mesurer |
 | Alias | **Le sitemap ne contient pas les redirections** : les noms courts (« Cain ») manquent, alors qu'ils sont essentiels à la correspondance exacte |
 | Titres avec précision entre parenthèses | 6 807 titres sur 50 000 dans le premier fichier du sitemap, dont 1 247 pages de désambiguïsation, 802 « (Short Story) », 484 « (Novel) » : à retirer avant la recherche, et à filtrer du lexique pour les pages qui ne sont pas des entités |
 | Mots courants en titre | Présents (ex. « Blank ») : risque de fausses apparitions |
-| Cohérence | Politique éditoriale axée sur le lore canon et les médias, excluant les règles de jeu (comme sur Fandom). Risque de spéculation fan à surveiller. |
-| Fraîcheur | Mise à jour communautaire continue. |
+| Cohérence | Politique éditoriale : à vérifier sur les pages de règles du wiki (espace de noms Meta:). Non vérifiée à ce jour |
 | Risque | Vandalisme, guerres d'édition, renommages de pages (le titre n'est pas une clé stable) |
 | Citations | Les articles citent généralement leurs sources (codex, romans, White Dwarf) ; à vérifier article par article |
 
