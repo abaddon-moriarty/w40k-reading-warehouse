@@ -4,8 +4,8 @@ The warehouse exists to answer these questions. Every source, table and test mus
 
 ## Definitions (v0.1)
 
-- **Entity**: a page title found in the category tree of the wikis (warhammer40k.wiki.gg, Lexicanum), plus its redirects as aliases. Its **type** (character, place, object, weapon, ship) comes from the branch of the category tree it was found in.
-- **Appearance**: the entity's name (page title or alias) found exactly as written in the text of an EPUB file. This is dictionary matching, not NER: a mention counts as an appearance, pronouns are ignored.
+- **Entity**: a page title taken from a few manual XML exports of warhammer40k.wiki.gg (Special:Export, one novel-series category at a time, in reading order, done by hand in the browser). Its **type** (character, place, object, weapon, ship) comes from the page's own wiki categories, through a hand-kept mapping (`category_type_map`). Pages that are works (novels, short stories) are not entities. v0.1 uses **names only**: no article text is loaded or shown. Automated access to the wikis is requested for V1/V2.
+- **Appearance**: the entity's name (page title without its bracketed qualifier, or a hand-kept alias such as "Heldane" for "Golesh Constantine Pheppos Heldane") found exactly as written in the text of an EPUB file. This is dictionary matching, not NER: a mention counts as an appearance, pronouns are ignored.
 - **Book**: one EPUB file. An omnibus is one book in v0.1; splitting it into works comes in V2.
 - **Read**: a book is read when KOReader reports it as finished. Reading order is the order of the finishing dates.
 
@@ -22,7 +22,8 @@ The warehouse exists to answer these questions. Every source, table and test mus
 ## Scope of v0.1
 
 - Grain: **entity × book**. An entity is unlocked when a book in which it appears is finished, not at the exact page.
-- Entities: characters, places, objects, weapons and ships, all through the same method. An entity listed under several branches of the category tree gets one type by a priority rule.
-- Out of scope, planned for V2: position inside a book (question 5), splitting omnibuses into works, a finer NER (coreference, short names without a redirect).
+- Entities: characters, places, objects, weapons and ships, all through the same method. An entity whose page belongs to several typed categories gets one type by a priority rule.
+- Out of scope, planned for V1/V2: automated access to a wiki (permission requested), aliases from redirects, position inside a book (question 5), splitting omnibuses into works, a finer NER (coreference, short names).
+- Later (V+): a glossary of common terms (Generic Terms, Titles and Ranks, Tactics, Languages, List of Terms), shown as definitions rather than unlocked entities; it needs the article text, so it waits for access to the wikis.
 
-Known limits of exact matching (homonyms such as "Blank", names with a disambiguation in brackets, short names, possessives) are listed in the project tracking document with the planned fix for each.
+Known limits of exact matching (homonyms and common words such as "Blank" or "Hubris", names with a disambiguation in brackets, full names never written as such, short names, possessives) are listed in the project tracking document with the planned fix for each.
