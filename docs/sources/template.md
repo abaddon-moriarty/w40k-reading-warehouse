@@ -7,6 +7,8 @@ Mode d'emploi
   (ex. « meta=siteinfo, 28/10/2026 », « robots.txt, 28/10/2026 », « page About »).
   Une valeur sans vérification s'écrit « à vérifier », jamais comme un fait.
 - Pas de chiffre sans source. Pas de référence qui ne renvoie à rien.
+- Pour une source externe, trois documents se lisent ensemble : licence, robots.txt, conditions d'utilisation.
+  Le robots.txt dit ce qu'un programme peut techniquement interroger ; seules les conditions disent ce qu'on a le droit d'en faire.
 - Laisser « sans objet » plutôt que supprimer une ligne : l'absence est une information.
 - Supprimer ces commentaires une fois la fiche remplie.
 -->
@@ -17,7 +19,7 @@ Mode d'emploi
 > - Version :
 > - Statut : brouillon | vérifiée | écartée
 > - Questions servies : <!-- numéros des questions (docs/questions.md) et éléments de données couverts -->
-> - Décision : retenue | écartée | en attente <!-- une phrase : pourquoi -->
+> - Décision : retenue | écartée | en attente : <!-- une phrase : pourquoi -->
 
 ## 1. Identité
 | Champ | Valeur | Vérification |
@@ -37,7 +39,9 @@ Mode d'emploi
 | Format natif | <!-- tables SQL, JSON, CSV, XML, HTML… --> | |
 | Points d'accès disponibles | <!-- API (endpoint), export, dump, sitemap, fichier, connexion directe --> | |
 | Authentification | <!-- aucune, clé, compte, autorisation préalable --> | |
-| Conditions d'accès automatisé | <!-- robots.txt, conditions d'utilisation, quotas, délai entre requêtes --> | |
+| Robots.txt | <!-- ce qu'il autorise et interdit aux programmes ; le robots.txt ne dit rien des usages permis --> | |
+| Conditions d'utilisation | <!-- lire les Terms of Service / Terms of Use EN ENTIER : extraction automatisée, constitution de base de données, licence réelle du contenu, contenu de l'API. Citer les paragraphes --> | |
+| Conditions d'accès automatisé (synthèse) | <!-- autorisé / autorisé avec conditions / soumis à accord écrit / interdit, et pourquoi --> | |
 | Mode d'accès retenu | <!-- comment le projet y accède réellement, et à quel rythme --> | |
 | Emplacement de la copie locale | <!-- ex. data/raw/<source>/ --> | |
 
@@ -99,7 +103,7 @@ Mode d'emploi
 | Données personnelles collectées par le projet | <!-- lesquelles, ou « aucune » --> | |
 | Base légale et finalité (si données personnelles) | | |
 | Minimisation appliquée | <!-- ce qu'on écarte volontairement --> | |
-| Licence | <!-- nom exact, version, où elle est déclarée --> | |
+| Licence | <!-- nom exact, version, où elle est déclarée ; vérifier que les conditions d'utilisation ne la restreignent pas (délai, contenu exclu) --> | |
 | Restrictions d'usage | <!-- commercial, attribution, partage à l'identique, propriété intellectuelle --> | |
 | Attribution à faire | <!-- texte et emplacement (README, interface) --> | |
 | Durée de conservation | | |

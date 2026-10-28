@@ -3,7 +3,7 @@
 > **Métadonnées de la fiche**
 > - Rédacteur : Marine Prost
 > - Date de création / dernière mise à jour : 28/10/2026
-> - Version : 2
+> - Version : 3
 > - Statut : brouillon
 > - Questions servies : 1 à 3 (`docs/questions.md`), pour les éléments « livre fini, date de fin » et « ordre de lecture » ; 5 en V2 (position de lecture)
 > - Décision : retenue (source de référence pour ce qui a été lu, et quand)
@@ -26,7 +26,9 @@
 | Format natif | Tables SQLite | |
 | Points d'accès disponibles | Fichier sur la liseuse, lisible quand elle est branchée en USB | |
 | Authentification | Aucune | |
-| Conditions d'accès automatisé | Sans objet (fichier local). Ne jamais écrire dans le fichier de la liseuse | |
+| Robots.txt | Sans objet (fichier local) | |
+| Conditions d'utilisation | Sans objet (mes propres données) | |
+| Conditions d'accès automatisé (synthèse) | Sans objet (fichier local). Ne jamais écrire dans le fichier de la liseuse | |
 | Mode d'accès retenu | Copie par l'API de sauvegarde SQLite, source ouverte en lecture seule (`mode=ro`), puis chargement dans DuckDB, dans le schéma dédié `raw_koreader` | `copy_database.py`, issue #12 |
 | Emplacement de la copie locale | `data/raw/koreader_db.sqlite3` ; tables chargées dans le schéma `raw_koreader` de `data/warehouse.duckdb` | `copy_database.py`, README |
 
@@ -116,3 +118,4 @@
 |---|---|---|
 | 1 | 28/10/2026 | Création |
 | 2 | 28/10/2026 | Schéma `raw_koreader` et rechargement par transaction (issue #12) ; statut « fini » lu dans les `.sdr` |
+| 3 | 28/10/2026 | Lignes Robots.txt et Conditions d'utilisation du modèle |

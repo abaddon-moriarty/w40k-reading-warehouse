@@ -3,8 +3,9 @@
 > **Métadonnées de la fiche**
 > - Rédacteur : Marine Prost
 > - Date : 28/10/2026
-> - Version : 1
-> - Statut : brouillon
+> - Version : 2
+> - Statut : brouillon (accès, licence et conditions d'utilisation vérifiés le 28/10/2026)
+> - Décision : **non retenue en l'état** — accès automatisé interdit sans autorisation écrite de Fandom, Inc.
 > - Référence : modèle de la fiche `warhammer40k.wiki.gg`
 > - Questions servies : 1 à 4 (`docs/questions.md`), pour les éléments « nom de l'entité », « type » et « alias »
 
@@ -12,7 +13,7 @@
 | Champ | Valeur |
 |---|---|
 | Nom | Warhammer 40k Wiki |
-| Identifiant unique (slug) | `warhammer40k` (sous-domaine Fandom : `warhammer40k.fandom.com`) |
+| Identifiant unique (slug) | `warhammer40k` (identifiant renvoyé par l'API, `wikiid`) |
 | URL principale | https://warhammer40k.fandom.com/wiki/Warhammer_40k_Wiki |
 | Description | « collaborative project to create the most definitive, accurate, and accessible encyclopedia and reference for everything related to Warhammer 40,000 », avec un objectif affiché de qualité d'édition « uncommon on most other fan-based wikis » |
 | Domaine métier | Univers fictionnel Warhammer 40,000 |
@@ -50,7 +51,8 @@
 ## 5. Opérationnel
 | Champ | Valeur |
 |---|---|
-| Mode d'accès envisagé (non retenu en v0.1) | API MediaWiki, autorisée par le robots.txt. Requêtes une par une, `User-Agent` identifiant le projet avec un contact, paramètre `maxlag`, réponses mises en cache dans `data/raw/` |
+| Mode d'accès retenu | **Aucun en l'état.** Les conditions d'utilisation interdisent tout accès automatisé sans autorisation écrite (voir ligne suivante), même si le robots.txt autorise l'API |
+| Conditions d'utilisation (Fandom Terms of Use, révision du 19/12/2025, consultées le 28/10/2026) | Section *User conduct* : interdiction d'« use any robot, spider, site search and/or retrieval application, or other device to scrape, extract, retrieve or index any portion of the content » et de « use any robot, spider, scraper or other automated means to access the Services for any purpose without our express written permission ». Interdiction de « scrape (…) aggregate » le contenu, sauf ce que permet la page Licensing pour le texte des wikis (CC BY-SA). Interdiction d'utiliser le contenu pour développer un logiciel ou entraîner une IA sans accord écrit. **La licence CC BY-SA autorise la réutilisation du texte, mais pas l'accès automatisé pour le récupérer** |
 | Robots.txt (vérifié le 28/10/2026) | `User-agent: *` : `Allow` sur `/api.php?` et `/api.php?action=` ; `Disallow` sur `/wiki/Special:`, `/wiki/User:`, `/wiki/Template:`, `/wiki/Help:`. Pas de signal de contenu. Des robots d'IA nommés sont exclus (GPTBot, ClaudeBot, CCBot…) |
 | Fréquence de mise à jour | Continue (éditions communautaires) |
 | Fraîcheur | Horodatage de dernière révision par page (`prop=revisions&rvprop=timestamp`) |
@@ -94,3 +96,9 @@
 | Sources amont | Codex Games Workshop, romans Black Library, White Dwarf ; Wikipédia (copie autorisée sous CC BY-SA) |
 | Destinations aval | `data/raw/` (réponses de l'API) → `raw` dans DuckDB → staging (lexique normalisé, alias) → `dim_entity` → correspondance avec le texte EPUB → plugin Pokédex KOReader |
 | Transformations | Titres et catégories via l'API, redirections via `list=allredirects`, retrait des précisions entre parenthèses, filtrage des pages hors entités, type par branche de catégorie |
+
+## 10. Décisions et questions ouvertes
+| Date | Décision ou question | Statut |
+|---|---|---|
+| 28/10/2026 | Non retenue : les Terms of Use (19/12/2025) interdisent l'accès automatisé et l'extraction sans autorisation écrite | Décidé |
+| 28/10/2026 | Deux projets publics collectent ce wiki ([w40k-explorer](https://github.com/guico33/w40k-explorer) : parcours de `Special:AllPages` puis HTML de chaque article ; [nosql-rag-azure](https://github.com/dacraw/nosql-rag-azure) : API `action=parse`). Aucun accord ni attribution mentionnés, User-Agent qui imite un navigateur. Ils ne constituent pas un précédent. Pratiques reprises pour notre pipeline : brut et transformé séparés, collecte reprenable, options `--dry-run` et `--retry-failed` ; `action=parse` avec `prop=categories` gardé pour le jour où un accès est accordé | Noté |

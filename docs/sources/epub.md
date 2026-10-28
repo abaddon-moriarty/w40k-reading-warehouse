@@ -3,7 +3,7 @@
 > **Métadonnées de la fiche**
 > - Rédacteur : Marine Prost
 > - Date de création / dernière mise à jour : 28/10/2026
-> - Version : 1
+> - Version : 2
 > - Statut : brouillon
 > - Questions servies : 1 à 4 (`docs/questions.md`). Métadonnées : « identité du livre », « série et rang », « livres possédés ». Texte : « présence de l'entité dans un livre »
 > - Décision : retenue (référence pour la liste des livres possédés, et seule source du texte)
@@ -26,7 +26,9 @@
 | Format natif | Archive ZIP : `META-INF/container.xml`, fichier OPF (métadonnées, manifeste, ordre de lecture), chapitres en XHTML | |
 | Points d'accès disponibles | Fichiers sur la liseuse ; une copie locale existe aussi | |
 | Authentification | Aucune | |
-| Conditions d'accès automatisé | Sans objet (fichiers locaux) | |
+| Robots.txt | Sans objet (fichiers locaux) | |
+| Conditions d'utilisation | Sans objet pour l'accès ; textes sous droits de l'éditeur (voir §8) | |
+| Conditions d'accès automatisé (synthèse) | Sans objet (fichiers locaux) | |
 | Mode d'accès retenu | Lecture des archives en place, sans les modifier. Métadonnées : `extract/book_list.py`. Texte : extraction à écrire (issue dédiée) | |
 | Emplacement de la copie locale | `data/raw/epub_metadata.jsonl` (métadonnées) ; texte extrait à venir dans `data/raw/` | |
 
@@ -110,8 +112,10 @@
 | 27/10/2026 | Unité de comptage v0.1 : le fichier | Décidé |
 | 27/10/2026 | Doublons et omnibus : marqués dans un seed, jamais supprimés | Décidé |
 | 27/10/2026 | Source du titre de référence : titre normalisé + seed pour les cas faux | Ouvert |
+| 28/10/2026 | Les seeds qui citent des fichiers (`book_mapping`, `coverage_check`) restent en local (`data/seeds/`) : la liste des fichiers révèle ma bibliothèque. Clé = chemin relatif, sans hachage | Décidé |
 
 ## Historique de la fiche
 | Version | Date | Modification |
 |---|---|---|
 | 1 | 28/10/2026 | Création |
+| 2 | 28/10/2026 | Seeds qui citent des fichiers gardés en local ; lignes Robots.txt et Conditions d'utilisation du modèle |
