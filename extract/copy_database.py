@@ -2,8 +2,7 @@ import logging
 import sqlite3
 import sys
 
-import duckdb
-
+from extract.common.warehouse import log_row_count, open_warehouse, transaction
 from extract.config import RAW_DIR, WAREHOUSE_PATH, koreader_settings_dir
 
 
@@ -21,33 +20,24 @@ def copy_data_db(source_path, raw_output_path):
 
 
 def load_raw(sqlite_path, warehouse_path, schema="raw_koreader"):
-    conn = duckdb.connect(str(warehouse_path), config={"storage_compatibility_version": "v1.5.0"})
-
-    conn.execute("INSTALL AND LOAD sqlite;")
-    conn.execute(f"ATTACH '{sqlite_path}' AS statistics (TYPE sqlite, READ_ONLY);")
-
-    tables = conn.execute(
-        """
-        SELECT table_name FROM information_schema.tables
-        WHERE table_catalog = 'statistics'
-        AND table_type = 'BASE TABLE';
-        """
-    ).fetchall()
-
-    conn.execute("BEGIN TRANSACTION")
-    try:
-        conn.execute(f"DROP SCHEMA IF EXISTS {schema} CASCADE")
-        conn.execute(f"CREATE SCHEMA {schema}")
-        for (table,) in tables:
-            conn.execute(f'CREATE TABLE {schema}."{table}" AS SELECT * FROM statistics."{table}"')
-            row_count = conn.execute(f'SELECT COUNT(*) FROM {schema}."{table}"').fetchone()[0]
-            logging.info("Loaded %s.%s (%s rows)", schema, table, row_count)
-        conn.execute("COMMIT")
-    except Exception:
-        conn.execute("ROLLBACK")
-        raise
-    finally:
-        conn.close()
+    with open_warehouse(warehouse_path) as conn:
+        conn.execute("INSTALL sqlite; LOAD sqlite;")
+        conn.execute(f"ATTACH '{sqlite_path}' AS statistics (TYPE sqlite, READ_ONLY)")
+        tables = conn.execute(
+            """
+            SELECT table_name FROM information_schema.tables
+            WHERE table_catalog = 'statistics'
+            AND table_type = 'BASE TABLE';
+            """
+        ).fetchall()
+        with transaction(conn):
+            conn.execute(f"DROP SCHEMA IF EXISTS {schema} CASCADE")
+            conn.execute(f"CREATE SCHEMA {schema}")
+            for (table,) in tables:
+                conn.execute(
+                    f'CREATE TABLE {schema}."{table}" AS SELECT * FROM statistics."{table}"'
+                )
+                log_row_count(conn, schema, table)
 
 
 def run(source, raw_dir, warehouse_path):

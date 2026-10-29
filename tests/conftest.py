@@ -25,26 +25,42 @@ def fake_koreader_db(tmp_path):
 
 @pytest.fixture
 def snapshot():
-    """Return a function that captures every table of a DuckDB schema with its rows.
+    """Capture every table of a DuckDB schema with its rows.
 
-    Rows are sorted so that row order never makes two identical states look different.
-    Reuse it in any idempotence test: run, snapshot, run again, snapshot, compare.
+    Rows are ordered by DuckDB (ORDER BY ALL) so row order never makes two
+    identical states differ; this also handles NULLs and nested types,
+    which Python's sorted() cannot compare.
     """
 
-    def _snapshot(warehouse_path, schema="raw"):
+    def _snapshot(warehouse_path, schema):
         conn = duckdb.connect(str(warehouse_path), read_only=True)
-        tables = [
-            name
-            for (name,) in conn.execute(
-                "SELECT table_name FROM information_schema.tables "
-                "WHERE table_schema = ? ORDER BY table_name",
-                [schema],
-            ).fetchall()
-        ]
-        state = {
-            t: sorted(conn.execute(f'SELECT * FROM {schema}."{t}"').fetchall()) for t in tables
-        }
-        conn.close()
-        return state
+        try:
+            tables = [
+                name
+                for (name,) in conn.execute(
+                    "SELECT table_name FROM information_schema.tables "
+                    "WHERE table_schema = ? ORDER BY table_name",
+                    [schema],
+                ).fetchall()
+            ]
+            return {
+                t: conn.execute(f'SELECT * FROM "{schema}"."{t}" ORDER BY ALL').fetchall()
+                for t in tables
+            }
+        finally:
+            conn.close()
 
     return _snapshot
+
+
+@pytest.fixture
+def warehouse_path(tmp_path):
+    return tmp_path / "warehouse.duckdb"
+
+
+@pytest.fixture(autouse=True)
+def _isolate_warehouse(monkeypatch, tmp_path):
+    """Force WAREHOUSE_PATH to tmp so no test ever touches the real warehouse."""
+    from extract import config
+
+    monkeypatch.setattr(config, "WAREHOUSE_PATH", tmp_path / "isolated.duckdb")
