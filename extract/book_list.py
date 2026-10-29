@@ -7,16 +7,13 @@ from zipfile import BadZipFile, ZipFile
 
 import duckdb
 
+from extract.common.xml_ns import get_local_name
 from extract.config import EREADER_ROOT, RAW_DIR, W40K_FOLDER, WAREHOUSE_PATH
 
 OPF_NS = {
     "opf": "http://www.idpf.org/2007/opf",
     "dc": "http://purl.org/dc/elements/1.1/",
 }
-
-
-def _strip_ns(name: str) -> str:
-    return name.partition("}")[2] or name
 
 
 def find_opf_path(zip_file: ZipFile):
@@ -73,14 +70,14 @@ def read_opf_metadata(epub: ZipFile):
                 key = element.attrib.get("name") or element.attrib.get("property")
                 value = element.attrib.get("content") or element.text
                 attrs = {
-                    _strip_ns(k): v
+                    get_local_name(k): v
                     for k, v in element.attrib.items()
-                    if _strip_ns(k) not in ("name", "property", "content")
+                    if get_local_name(k) not in ("name", "property", "content")
                 }
             else:
                 key = local_name
                 value = element.text
-                attrs = {_strip_ns(k): v for k, v in element.attrib.items()}
+                attrs = {get_local_name(k): v for k, v in element.attrib.items()}
 
             rows.append(
                 {
