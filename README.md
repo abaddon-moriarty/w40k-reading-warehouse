@@ -111,8 +111,8 @@ Work is tracked in [GitHub Issues](https://github.com/abaddon-moriarty/w40k-read
 | Milestone | Status |
 |---|---|
 | 1. Questions | Done |
-| 2. Sources | In progress |
-| 3. Compliance | To do |
+| 2. Sources | Done |
+| 3. Compliance | Done |
 | 4. Quality | To do |
 | 5. Pipeline | To do |
 | 6. Consolidation | To do |
