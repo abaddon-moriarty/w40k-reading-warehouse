@@ -32,6 +32,7 @@ tab_space_size = 2
 dev = [
     "pre-commit>=4.7.0",
     "pytest>=9.1.1",
+    "ruff>=0.17.3",
     "sqlfluff==4.4.0",
 ]
 
