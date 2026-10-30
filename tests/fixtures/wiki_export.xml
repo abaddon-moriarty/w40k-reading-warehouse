@@ -1,0 +1,35 @@
+<!-- Hand-made Special:Export sample: every name and every text below is invented. -->
+<mediawiki xmlns="http://www.mediawiki.org/xml/export-0.11/" version="0.11" xml:lang="en">
+  <siteinfo>
+    <sitename>Invented Wiki</sitename>
+  </siteinfo>
+  <page>
+    <title>Invented Inquisitor</title>
+    <ns>0</ns>
+    <id>101</id>
+    <revision>
+      <id>9001</id>
+      <timestamp>2026-01-01T00:00:00Z</timestamp>
+      <contributor>
+        <username>Invented Scribe</username>
+        <id>7</id>
+      </contributor>
+      <comment>Invented edit comment</comment>
+      <text xml:space="preserve">Invented article body. [[Category:Invented Novels]] [[Category: Invented Characters |sort key]]</text>
+    </revision>
+  </page>
+  <page>
+    <title>Invented World</title>
+    <ns>0</ns>
+    <id>102</id>
+    <revision>
+      <id>9002</id>
+      <timestamp>2026-01-02T00:00:00Z</timestamp>
+      <contributor>
+        <username>Invented Archivist</username>
+        <id>8</id>
+      </contributor>
+      <text xml:space="preserve">Invented article body. [[Category:Invented Novels]]</text>
+    </revision>
+  </page>
+</mediawiki>

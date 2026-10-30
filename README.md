@@ -1,4 +1,5 @@
 # w40k-reading-warehouse
+
 A local data warehouse built from my Warhammer 40k reading: KOReader reading statistics, EPUB metadata and a lexicon of entity names from the wiki, loaded into DuckDB and modelled with dbt.
 
 **Problem**: KOReader knows how long I read each page, but not what I read about: which characters, places and factions I have already met, and in which book. The actual problem is that the Warhammer 40k universe is DENSE and I'm getting lost. This warehouse joins the two so that a future KOReader plugin (a spoiler-free "Pokédex" of the 40k universe) can answer "what do I know so far?".
@@ -8,7 +9,7 @@ This is a personal learning project: each milestone practises one data engineeri
 ## Stack
 
 | Layer | Tool |
-|---|---|
+| --- | --- |
 | Environment | Python 3.14, [uv](https://docs.astral.sh/uv/) |
 | Storage and queries | [DuckDB](https://duckdb.org/) (with the `sqlite` extension) |
 | Transformations | [dbt](https://www.getdbt.com/) *(planned, from the Pipeline milestone)* |
@@ -23,13 +24,12 @@ wiki.gg manual exports (XML) ────────┼─► data/raw/ ─► 
 hand-kept seeds (data/seeds/) ───────┘
 ```
 
-
 | Source | Extract script | Raw file | Raw table(s) | Status |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | KOReader reading statistics | `extract/copy_database.py` | `data/raw/koreader_db.sqlite3` | `raw_koreader.book`, `raw_koreader.page_stat_data`, `raw_koreader.numbers`, `raw_koreader.sqlite_sequence` | Done |
 | EPUB metadata (OPF) | `extract/book_list.py` | `data/raw/epub_metadata.jsonl` | `raw.epub_metadata` | Done |
 | Reading status (finished) | *(to do)* | KOReader `.sdr` metadata | *(to do)* | To do |
-| Entity names (wiki.gg) | *(to do)* | `data/raw/wiki_gg/*.xml`, exported by hand | `raw.wiki_pages`, `raw.wiki_page_categories` | To do |
+| Entity names (wiki.gg) | `extract/wiki_export.py` | `data/raw/wiki_gg/*.xml`, exported by hand | `raw.wiki_pages`, `raw.wiki_page_categories` | Done |
 | Hand-kept seeds | `dbt seed` | `data/seeds/*.csv` (local; invented examples in `dbt/seeds_example/`) | `wiki_exports`, `category_type_map`, `entity_alias`, `lexicon_exclusions`, `coverage_check`, `book_mapping` | To do |
 | EPUB tables of contents | *(to do)* | | | V2 |
 
@@ -50,7 +50,7 @@ cp .env.example .env   # then fill in the variables below
 ```
 
 | Variable | What it points to |
-|---|---|
+| --- | --- |
 | `KOREADER_SETTINGS_DIR` | Folder containing KOReader's `statistics.sqlite3` |
 | `EREADER_ROOT` | Root of the e-reader (or of its local copy); stored file paths are relative to it |
 | `W40K_FOLDER` | Folder holding the Warhammer 40k EPUBs, inside `EREADER_ROOT` |
@@ -67,6 +67,7 @@ find /path/to/ereader -name statistics.sqlite3
 ```bash
 uv run python -m extract.copy_database   # copy the KOReader database and load it into raw_koreader
 uv run python -m extract.book_list       # read the metadata of every EPUB and load it into raw.epub_metadata
+uv run python -m extract.wiki_export     # read every wiki.gg XML export and load raw.wiki_pages and raw.wiki_page_categories
 uv run pytest                            # run the tests
 duckdb -ui data/warehouse.duckdb         # explore the warehouse in the browser
 ```
@@ -88,14 +89,16 @@ deactivate 2>/dev/null || true   # otherwise uv warns that VIRTUAL_ENV points to
 REPO=$(pwd) BRANCH=$(git branch --show-current) CHECK=$(mktemp -d)
 git clone -b "$BRANCH" https://github.com/abaddon-moriarty/w40k-reading-warehouse.git "$CHECK"
 cd "$CHECK" && uv sync && cp "$REPO/.env" .env \
+  && mkdir -p data/raw/wiki_gg && cp "$REPO"/data/raw/wiki_gg/*.xml data/raw/wiki_gg/ \
   && uv run python -m extract.copy_database \
   && uv run python -m extract.book_list \
+  && uv run python -m extract.wiki_export \
   && uv run pytest
 cd "$REPO" && rm -rf "$CHECK"   # always runs, even if a step above failed
+
 ```
 
 The e-reader must be plugged in for the extract scripts. Every file is written inside the temporary clone (`data/` included), so the last line removes all of it.
-
 
 ## Project layout
 
@@ -113,7 +116,7 @@ data/      local only, ignored by Git: raw copies and warehouse.duckdb
 Work is tracked in [GitHub Issues](https://github.com/abaddon-moriarty/w40k-reading-warehouse/issues) and a GitHub Project board. One milestone per concept, one issue per work session, one pull request per issue.
 
 | Milestone | Status |
-|---|---|
+| --- | --- |
 | 1. Questions | Done |
 | 2. Sources | Done |
 | 3. Compliance | Done |
@@ -154,7 +157,7 @@ The full list, with the planned fix for each, is kept in the project tracking do
 **Data:** no data is distributed with this repository. Reading statistics, book files and extracts stay on my machine (`data/` is ignored by Git).
 
 | Source | Licence | Automated collection | Status |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | KOReader statistics, EPUB files | Personal data / copyrighted books | Local files | Read locally, never committed |
 | [Warhammer 40k Lexicanum](https://wh40k.lexicanum.com) | CC BY-NC by default, restricted by the Terms of Service | Forbidden without prior written permission (Terms of Service) | Not used; permission to request (V2) |
 | [Warhammer 40k Wiki (Fandom)](https://warhammer40k.fandom.com) | CC BY-SA | Forbidden without express written permission (Terms of Use) | Not used |

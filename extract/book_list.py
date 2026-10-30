@@ -5,7 +5,8 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 from zipfile import BadZipFile, ZipFile
 
-from extract.common.warehouse import log_row_count, open_warehouse, transaction
+from extract.common.jsonl_helper import write_jsonl
+from extract.common.warehouse import load_jsonl
 from extract.common.xml_ns import get_local_name, get_namespace
 from extract.config import EREADER_ROOT, RAW_DIR, W40K_FOLDER
 
@@ -96,29 +97,6 @@ def read_opf_metadata(epub: ZipFile):
         return []
 
 
-def write_jsonl(rows, path):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as f:
-        for row in rows:
-            f.write(json.dumps(row, ensure_ascii=False) + "\n")
-    logging.info(
-        "Wrote %d rows for %d files to %s",
-        len(rows),
-        len({r["file"] for r in rows}),
-        path,
-    )
-
-
-def upload_metadata_to_warehouse(output_path):
-    with open_warehouse() as conn, transaction(conn):
-        conn.execute("CREATE SCHEMA IF NOT EXISTS raw")
-        conn.execute(
-            "CREATE OR REPLACE TABLE raw.epub_metadata AS SELECT * FROM read_json(?)",
-            [str(output_path)],
-        )
-        log_row_count(conn, "raw", "epub_metadata")
-
-
 def main():
     logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
     if not W40K_FOLDER:
@@ -143,8 +121,8 @@ def main():
         except BadZipFile:
             logging.exception("%s is not a valid EPUB archive, skipping", epub_path)
 
-    write_jsonl(rows, output_path)
-    upload_metadata_to_warehouse(output_path)
+    write_jsonl(rows, output_path, key="file")
+    load_jsonl(output_path, "raw", "epub_metadata")
     return 0
 
 

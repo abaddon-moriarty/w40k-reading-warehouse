@@ -3,10 +3,12 @@ import sqlite3
 import duckdb
 import pytest
 
+from extract import wiki_export
 from extract.copy_database import run
 
 PIPELINES = [
     pytest.param(run, "fake_koreader_db", "raw_koreader", id="koreader_stats"),
+    pytest.param(wiki_export.run, "fake_wiki_xml", "raw", id="wiki_export"),
     # pytest.param(vocabulary.run, "fake_vocab_db", "raw_vocabulary", id="vocabulary"),
 ]
 

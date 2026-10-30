@@ -11,6 +11,7 @@ RAW_DIR = DATA_DIR / "raw"
 WAREHOUSE_PATH = DATA_DIR / "warehouse.duckdb"
 EREADER_ROOT = os.environ.get("EREADER_ROOT")
 W40K_FOLDER = os.environ.get("W40K_FOLDER")
+XML_SOURCE = os.environ.get("XML_SOURCE")
 
 
 def koreader_settings_dir() -> Path:

@@ -1,12 +1,15 @@
 """Tests for extract/common/warehouse.py."""
 
+import json
 import logging
 
 import duckdb
 import pytest
 
+from extract import config
 from extract.common.warehouse import (
     DUCKDB_CONFIG,
+    load_jsonl,
     log_row_count,
     open_warehouse,
     transaction,
@@ -162,3 +165,73 @@ class TestLogRowCount:
     def test_missing_table_raises(self, conn):
         with pytest.raises(duckdb.CatalogException):
             log_row_count(conn, "s", "t")
+
+
+class TestLoadJsonl:
+    @staticmethod
+    def _jsonl(path, *rows):
+        path.write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")
+        return path
+
+    def test_creates_schema_and_table(self, tmp_path, warehouse_path, snapshot):
+        path = self._jsonl(tmp_path / "a.jsonl", {"x": 1}, {"x": 2})
+
+        load_jsonl(path, "s", "t", warehouse_path)
+
+        assert snapshot(warehouse_path, "s") == {"t": [(1,), (2,)]}
+
+    def test_reload_replaces_the_table(self, tmp_path, warehouse_path, snapshot):
+        load_jsonl(self._jsonl(tmp_path / "a.jsonl", {"x": 1}), "s", "t", warehouse_path)
+        load_jsonl(self._jsonl(tmp_path / "b.jsonl", {"y": "new"}), "s", "t", warehouse_path)
+
+        assert snapshot(warehouse_path, "s") == {"t": [("new",)]}
+
+    def test_does_not_touch_other_tables(self, tmp_path, warehouse_path, snapshot):
+        load_jsonl(self._jsonl(tmp_path / "a.jsonl", {"x": 1}), "s", "keep", warehouse_path)
+        load_jsonl(self._jsonl(tmp_path / "b.jsonl", {"x": 2}), "s", "other", warehouse_path)
+
+        assert snapshot(warehouse_path, "s") == {"keep": [(1,)], "other": [(2,)]}
+
+    def test_logs_the_requested_table(self, tmp_path, warehouse_path, caplog):
+        """Regression: the log used to name raw.epub_metadata for every load."""
+        caplog.set_level(logging.INFO)
+
+        load_jsonl(self._jsonl(tmp_path / "a.jsonl", {"x": 1}), "s", "t", warehouse_path)
+
+        assert "Loaded s.t (1 rows)" in [r.message for r in caplog.records]
+
+    def test_defaults_to_the_configured_warehouse(self, tmp_path, snapshot):
+        load_jsonl(self._jsonl(tmp_path / "a.jsonl", {"x": 1}), "s", "t")
+
+        assert snapshot(config.WAREHOUSE_PATH, "s") == {"t": [(1,)]}
+
+    def test_glob_combines_every_matching_file(self, tmp_path, warehouse_path, snapshot):
+        self._jsonl(tmp_path / "a.jsonl", {"x": 1})
+        self._jsonl(tmp_path / "b.jsonl", {"x": 2})
+
+        load_jsonl(tmp_path / "*.jsonl", "s", "t", warehouse_path)
+
+        assert snapshot(warehouse_path, "s") == {"t": [(1,), (2,)]}
+
+    def test_quotes_identifiers_with_dots(self, tmp_path, warehouse_path, snapshot):
+        path = self._jsonl(tmp_path / "a.jsonl", {"x": 1})
+
+        load_jsonl(path, "weird.schema", "weird.table", warehouse_path)
+
+        assert snapshot(warehouse_path, "weird.schema") == {"weird.table": [(1,)]}
+
+    def test_failed_load_keeps_the_previous_table(self, tmp_path, warehouse_path, snapshot):
+        load_jsonl(self._jsonl(tmp_path / "a.jsonl", {"x": 1}), "s", "t", warehouse_path)
+
+        with pytest.raises(duckdb.IOException):
+            load_jsonl(tmp_path / "missing.jsonl", "s", "t", warehouse_path)
+
+        assert snapshot(warehouse_path, "s") == {"t": [(1,)]}
+
+    @pytest.mark.xfail(strict=True, reason="an empty file currently replaces a good table")
+    def test_empty_file_keeps_the_previous_table(self, tmp_path, warehouse_path, snapshot):
+        load_jsonl(self._jsonl(tmp_path / "a.jsonl", {"x": 1}), "s", "t", warehouse_path)
+
+        load_jsonl(self._jsonl(tmp_path / "empty.jsonl"), "s", "t", warehouse_path)
+
+        assert snapshot(warehouse_path, "s") == {"t": [(1,)]}

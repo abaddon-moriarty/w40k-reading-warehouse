@@ -1,4 +1,5 @@
 import sqlite3
+from pathlib import Path
 
 import duckdb
 import pytest
@@ -21,6 +22,12 @@ def fake_koreader_db(tmp_path):
     conn.commit()
     conn.close()
     return path
+
+
+@pytest.fixture
+def fake_wiki_xml():
+    """A hand-made Special:Export file: 2 pages, invented names, no real wiki text."""
+    return Path(__file__).parent / "fixtures" / "wiki_export.xml"
 
 
 @pytest.fixture

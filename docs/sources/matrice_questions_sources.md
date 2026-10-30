@@ -1,9 +1,9 @@
 # Matrice questions × sources
 
-## Matrice questions × sources
+## Matrice
 
 | Question | Fichiers EPUB | Statistiques KOReader | `.sdr` (statut) | wiki.gg (exports) | Seeds manuels |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | Q1 — Livres où apparaît une entité, premier dans mon ordre de lecture | Principale : apparitions dans le texte | Complément : date de dernière session, pour l'ordre de lecture | Principale : livre fini | Principale : liste et type des entités | Complément : alias, exclusions, correspondance des livres |
 | Q2 — Entités débloquées jusqu'ici, et celles qui restent verrouillées | Principale : apparitions | Complément : date de fin | Principale : livre fini | Principale : entités | Complément : alias, exclusions |
 | Q3 — Livre non lu qui débloquerait le plus | Principale : livres possédés et apparitions | Complément : livres ouverts | Principale : livre non fini | Principale : entités | Complément |
@@ -25,7 +25,7 @@
 Ce que l'on sait faux ou incomplet et qu'on accepte pour avancer. Chaque ligne dit comment le corriger plus tard ; elle alimente la section « limites » du README et la définition de « fini » de la V1.
 
 | Données | Biais / effet | Correction prévue | Concept |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Périmètre EPUB = le dossier `W40K_FOLDER` | Un livre Warhammer rangé ailleurs sur la liseuse est ignoré ; le décompte des livres peut être sous-estimé | Parcourir `EREADER_ROOT`, garder le dossier comme une donnée et décider en staging à partir du dossier, du subject, de l'éditeur et de la série | C3 complétude de la population |
 | Dates des OPF décalées d'un fuseau (`2004-12-02T23:00:00+00:00` pour un 3 décembre probable) | Tronquer à la date donne la veille | Convertir en heure de Paris avant de tronquer, en staging ; vérifier sur un livre dont la date est connue | C3 exactitude |
 | `calibre:timestamp` n'est pas une date de publication | Risque de confondre date d'ajout dans Calibre et date de sortie | N'utiliser que `dc:date` pour la publication ; compter les livres qui n'en ont pas | C3 validité |
@@ -39,7 +39,7 @@ Ce que l'on sait faux ou incomplet et qu'on accepte pour avancer. Chaque ligne d
 | Règle V1 : toute mention compte comme une apparition ; les pronoms sont ignorés | Surestime les rencontres (simple citation), sous-estime les scènes où le personnage est désigné par un pronom | Affiner en V2 (mention ou rencontre) | C7 grain |
 | Homonymes (ex. « Blank » : nom commun et terme de l'univers) | Fausses apparitions | Table d'alias et règles de désambiguïsation | C6 |
 | Couverture des wikis | Les personnages et lieux absents des wikis ne sont jamais reconnus | Mesurer la part de candidats sans correspondance ; recherche en ligne en V2 | C3, C6 |
-| Ni le nom de fichier ni le `dc:title` ne sont fiables seuls (issue #8 : 19 écarts en comparaison exacte, 4 après normalisation) | Forme : article « , The » en fin de nom, « _ » à la place de « : » ou « ' », apostrophe typographique, casse. Fond : titres faux dans les métadonnées (« Warhammer 40,000 » pour The Alien Beast Within, auteur collé au titre) | Macro `normalize_title` appliquée aux deux côtés (apostrophe typographique, « _s » → « 's », « _ » → « : », « , The » ramené en tête, minuscules) : clé de comparaison uniquement, le titre affiché reste celui d'origine. Restent 4 titres faux (Pariah, Old Soldiers Never Die, The Alien Beast Within, Choose Your Enemies) → seed de correspondance tenu à la main | C3 exactitude, C6 |
+| Ni le nom de fichier ni le `dc:title` ne sont fiables seuls (issue #8 : 19 écarts en comparaison exacte, 4 après normalisation) | Forme : article « , The » en fin de nom, « _ » à la place de « : » ou « ' », apostrophe typographique, casse. Fond : titres faux dans les métadonnées (« Warhammer 40,000 » pour The Alien Beast Within, auteur collé au titre) | Macro `normalize_title` appliquée aux deux côtés (apostrophe typographique, « _s » → « 's », «_ » → « : », « , The » ramené en tête, minuscules) : clé de comparaison uniquement, le titre affiché reste celui d'origine. Restent 4 titres faux (Pariah, Old Soldiers Never Die, The Alien Beast Within, Choose Your Enemies) → seed de correspondance tenu à la main | C3 exactitude, C6 |
 | Dates bidon dans `dc:date` (`0101-01-01`) | Une date par défaut passe pour une vraie date de publication | Convertir en NULL en staging (règle : année avant la première parution Black Library = date invalide) | C3 validité |
 | Séries inexploitables ou suspectes dans `calibre:series` | Valeurs techniques (« Warhammer.Grey Knights.Warhammer.99..ICBP », index 99), plage au lieu d'un nom (« Ultramarines #4-6 »), rattachements à vérifier (The Alien Beast Within en Ultramarines 11, Pariah en Eisenhorn 4) | Même seed de correspondance que les titres ; index 99 traité comme inconnu | C3 validité, C6 |
 | Correspondance exacte : titres de page avec précision entre parenthèses (« Blank (Psyker) ») | Le titre n'apparaît jamais tel quel dans le texte : personnage jamais trouvé | Retirer la partie entre parenthèses avant la recherche | C6 |
@@ -49,6 +49,7 @@ Ce que l'on sait faux ou incomplet et qu'on accepte pour avancer. Chaque ligne d
 | Les catégories du wiki contiennent aussi des listes, des pages de faction ou de concept ; une même page peut se trouver dans plusieurs branches (type ambigu) | Le lexique contient des entrées hors périmètre, ou une entité avec deux types | Filtrer (pages « List of », sous-catégories hors périmètre) ; règle de priorité entre types en cas de conflit ; mesurer la part d'entrées écartées | C2, C3 validité |
 
 ## Dette technique
+
 - [ ] Les scripts se terminent avec le code 0 même en cas d'erreur (dossier non configuré, liseuse non branchée) : `make extract` et la CI croiront que tout s'est bien passé.
 - [ ] Pas de vérification d'existence du dossier : liseuse débranchée = zéro livre, sans erreur.
 - [ ] `LOG_LEVEL` est dans le `.env` mais n'est pas lu par les scripts.

@@ -38,9 +38,9 @@ repos:
         files: '(^data/|\.epub$|\.sdr/|\.sqlite3$|\.duckdb$)'
 
       - id: pytest
-        name: Run tests before push
+        name: Run tests and check coverage before push
         language: system
-        entry: uv run pytest
+        entry: uv run pytest --cov
         pass_filenames: false
         always_run: true
         stages: [pre-push]
