@@ -7,7 +7,7 @@ from zipfile import BadZipFile, ZipFile
 
 import duckdb
 
-from extract.common.xml_ns import get_local_name
+from extract.common.xml_ns import get_local_name, get_namespace
 from extract.config import EREADER_ROOT, RAW_DIR, W40K_FOLDER, WAREHOUSE_PATH
 
 OPF_NS = {
@@ -64,7 +64,8 @@ def read_opf_metadata(epub: ZipFile):
         logging.debug("filename: %s", filename)
         rows = []
         for element in metadata.findall("*"):
-            namespace, _, local_name = element.tag[1:].partition("}")
+            local_name = get_local_name(element.tag)
+            namespace = get_namespace(element.tag)
 
             if local_name == "meta":
                 key = element.attrib.get("name") or element.attrib.get("property")
@@ -91,7 +92,7 @@ def read_opf_metadata(epub: ZipFile):
 
         logging.debug("%s", json.dumps(rows, indent=2, ensure_ascii=False))
         return rows
-    except ET.ParseError:
+    except ET.ParseError, KeyError:
         logging.exception("%s in %s is invalid, skipping", full_path, epub.filename)
         return []
 
