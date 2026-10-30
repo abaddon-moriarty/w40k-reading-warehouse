@@ -33,8 +33,8 @@ def log_row_count(conn: duckdb.DuckDBPyConnection, schema: str, table: str) -> i
     return count
 
 
-def load_jsonl(output_path: Path, schema: str, table: str):
-    with open_warehouse() as conn, transaction(conn):
+def load_jsonl(output_path: Path, schema: str, table: str, warehouse_path: Path | None = None):
+    with open_warehouse(warehouse_path) as conn, transaction(conn):
         conn.execute(f'CREATE SCHEMA IF NOT EXISTS "{schema}"')
         conn.execute(
             f'CREATE OR REPLACE TABLE "{schema}"."{table}" AS SELECT * FROM read_json(?)',

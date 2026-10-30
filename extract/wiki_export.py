@@ -38,6 +38,14 @@ def extraction_from_xml(xml_file):
     return rows
 
 
+def run(source, raw_dir, warehouse_path=None):
+    output_path = raw_dir / source.with_suffix(".jsonl").name
+    logging.debug(output_path)
+    rows = extraction_from_xml(source)
+    write_jsonl(rows, output_path, key="source_file")
+    load_jsonl(output_path, "raw", "wiki_pages", warehouse_path)
+
+
 def main():
     if not XML_SOURCE:
         logging.error("XML_SOURCE is not configured")
@@ -48,12 +56,7 @@ def main():
         input_path = Path(XML_SOURCE, file_name)
         logging.debug(input_path)
         input_path.resolve(strict=True)
-
-        output_path = input_path.with_suffix(".jsonl")
-        logging.debug(output_path)
-        rows = extraction_from_xml(input_path)
-        write_jsonl(rows, output_path, key="source_file")
-        load_jsonl(output_path, "raw", "wiki_pages")
+        run(input_path, input_path.parent)
     except FileNotFoundError:
         logging.exception("Path does not exist. Make sure the XML_SOURCE in your .env is correct.")
         return 1
