@@ -9,6 +9,7 @@ from extract.config import RAW_DIR, WAREHOUSE_PATH, koreader_settings_dir
 def copy_data_db(source_path, raw_output_path):
     src = sqlite3.connect(f"file:{source_path}?mode=ro", uri=True)
 
+    raw_output_path.parent.mkdir(parents=True, exist_ok=True)
     dst = sqlite3.connect(raw_output_path)
 
     src.backup(dst)
@@ -42,6 +43,7 @@ def load_raw(sqlite_path, warehouse_path, schema="raw_koreader"):
 
 def run(source, raw_dir, warehouse_path):
     raw_copy = raw_dir / "koreader_db.sqlite3"
+    logging.debug(raw_copy)
     copy_data_db(source, raw_copy)
     load_raw(raw_copy, warehouse_path, schema="raw_koreader")
 
