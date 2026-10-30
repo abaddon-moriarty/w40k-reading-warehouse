@@ -1,4 +1,5 @@
 import sqlite3
+from pathlib import Path
 
 import duckdb
 import pytest
@@ -24,29 +25,9 @@ def fake_koreader_db(tmp_path):
 
 
 @pytest.fixture
-def fake_wiki_xml(tmp_path):
-    """A tiny XML file shaped like a MediaWiki Special:Export."""
-    path = tmp_path / "fake_export.xml"
-    path.write_text(
-        """\
-<mediawiki xmlns="http://www.mediawiki.org/xml/export-0.11/" version="0.11">
-  <page>
-    <title>Fake Page One</title>
-    <ns>0</ns>
-    <id>1</id>
-    <revision><text>Article body. [[Category:Fake One]] [[Category:Fake Two]]</text></revision>
-  </page>
-  <page>
-    <title>Fake Page Two</title>
-    <ns>0</ns>
-    <id>2</id>
-    <revision><text>Article body. [[Category:Fake One]]</text></revision>
-  </page>
-</mediawiki>
-""",
-        encoding="utf-8",
-    )
-    return path
+def fake_wiki_xml():
+    """A hand-made Special:Export file: 2 pages, invented names, no real wiki text."""
+    return Path(__file__).parent / "fixtures" / "wiki_export.xml"
 
 
 @pytest.fixture
