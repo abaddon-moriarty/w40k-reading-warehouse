@@ -85,6 +85,20 @@ class TestMain:
             "W40K_FOLDER" in r.message or "W40K_FOLDER" in str(r.args) for r in caplog.records
         ), "main() should log which config value is missing"
 
+    def test_main_writes_jsonl_and_loads_epub_metadata(
+        self, fake_epub, monkeypatch, tmp_path, snapshot
+    ):
+        """Regression: main() once called write_jsonl with an undefined name."""
+        epub = fake_epub("<dc:title>Xenos</dc:title>", Path("w40k", "book.epub"))
+        patch_config(monkeypatch, "W40K_FOLDER", epub.parent)
+        patch_config(monkeypatch, "RAW_DIR", tmp_path / "raw")
+
+        assert book_list.main() == 0
+
+        assert (tmp_path / "raw" / "epub_metadata.jsonl").exists()
+        (row,) = snapshot(config.WAREHOUSE_PATH, "raw")["epub_metadata"]
+        assert (row[2], row[3]) == ("title", "Xenos")
+
 
 # --- read_opf_metadata: regression str(element) → element.tag -------------
 
