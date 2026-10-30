@@ -58,7 +58,7 @@ def export_to_jsonl(source, raw_dir):
 
     write_jsonl(pages_rows, output_page_path, key="export_file")
     if cat_rows:
-        write_jsonl(cat_rows, output_category_path, key="title")
+        write_jsonl(cat_rows, output_category_path, key="export_file")
     else:
         # Remove the file of a previous run, or its categories would still be loaded.
         output_category_path.unlink(missing_ok=True)
