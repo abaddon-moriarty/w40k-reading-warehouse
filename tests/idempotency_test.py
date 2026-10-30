@@ -57,7 +57,7 @@ def test_load_does_not_touch_other_sources(fake_koreader_db, tmp_path, snapshot)
     conn.execute("CREATE TABLE raw.epub_metadata AS SELECT 1 AS id, 'Fake EPUB' AS title")
     conn.close()
     run(fake_koreader_db, tmp_path, warehouse)
-    assert snapshot(warehouse)["epub_metadata"] == [(1, "Fake EPUB")]
+    assert snapshot(warehouse, "raw")["epub_metadata"] == [(1, "Fake EPUB")]
 
 
 def test_different_base_name_accepted(fake_koreader_db, tmp_path, snapshot):

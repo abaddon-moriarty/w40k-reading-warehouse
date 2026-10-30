@@ -85,12 +85,16 @@ Before opening a pull request, check that the pushed branch works on a fresh cop
 
 ```bash
 deactivate 2>/dev/null || true   # otherwise uv warns that VIRTUAL_ENV points to the main project's .venv
-REPO=$(pwd) BRANCH=$(git branch --show-current)
-rm -rf /tmp/check && cd /tmp
-git clone -b "$BRANCH" https://github.com/abaddon-moriarty/w40k-reading-warehouse.git check
-cd check && uv sync && cp "$REPO/.env" .env
-uv run python -m extract.book_list && uv run pytest
+REPO=$(pwd) BRANCH=$(git branch --show-current) CHECK=$(mktemp -d)
+git clone -b "$BRANCH" https://github.com/abaddon-moriarty/w40k-reading-warehouse.git "$CHECK"
+cd "$CHECK" && uv sync && cp "$REPO/.env" .env \
+  && uv run python -m extract.copy_database \
+  && uv run python -m extract.book_list \
+  && uv run pytest
+cd "$REPO" && rm -rf "$CHECK"   # always runs, even if a step above failed
 ```
+
+The e-reader must be plugged in for the extract scripts. Every file is written inside the temporary clone (`data/` included), so the last line removes all of it.
 
 
 ## Project layout

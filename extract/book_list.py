@@ -5,18 +5,14 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 from zipfile import BadZipFile, ZipFile
 
-import duckdb
-
-from extract.config import EREADER_ROOT, RAW_DIR, W40K_FOLDER, WAREHOUSE_PATH
+from extract.common.warehouse import log_row_count, open_warehouse, transaction
+from extract.common.xml_ns import get_local_name, get_namespace
+from extract.config import EREADER_ROOT, RAW_DIR, W40K_FOLDER
 
 OPF_NS = {
     "opf": "http://www.idpf.org/2007/opf",
     "dc": "http://purl.org/dc/elements/1.1/",
 }
-
-
-def _strip_ns(name: str) -> str:
-    return name.partition("}")[2] or name
 
 
 def find_opf_path(zip_file: ZipFile):
@@ -67,20 +63,21 @@ def read_opf_metadata(epub: ZipFile):
         logging.debug("filename: %s", filename)
         rows = []
         for element in metadata.findall("*"):
-            namespace, _, local_name = element.tag[1:].partition("}")
+            local_name = get_local_name(element.tag)
+            namespace = get_namespace(element.tag)
 
             if local_name == "meta":
                 key = element.attrib.get("name") or element.attrib.get("property")
                 value = element.attrib.get("content") or element.text
                 attrs = {
-                    _strip_ns(k): v
+                    get_local_name(k): v
                     for k, v in element.attrib.items()
-                    if _strip_ns(k) not in ("name", "property", "content")
+                    if get_local_name(k) not in ("name", "property", "content")
                 }
             else:
                 key = local_name
                 value = element.text
-                attrs = {_strip_ns(k): v for k, v in element.attrib.items()}
+                attrs = {get_local_name(k): v for k, v in element.attrib.items()}
 
             rows.append(
                 {
@@ -94,7 +91,7 @@ def read_opf_metadata(epub: ZipFile):
 
         logging.debug("%s", json.dumps(rows, indent=2, ensure_ascii=False))
         return rows
-    except ET.ParseError:
+    except ET.ParseError, KeyError:
         logging.exception("%s in %s is invalid, skipping", full_path, epub.filename)
         return []
 
@@ -113,17 +110,13 @@ def write_jsonl(rows, path):
 
 
 def upload_metadata_to_warehouse(output_path):
-    conn = duckdb.connect(str(WAREHOUSE_PATH), config={"storage_compatibility_version": "v1.5.0"})
-
-    conn.execute("CREATE SCHEMA IF NOT EXISTS raw")
-    conn.execute(
-        f"""CREATE OR REPLACE TABLE raw.epub_metadata AS
-            SELECT * FROM read_json('{output_path}');"""
-    )
-    row_count = conn.execute("SELECT COUNT(*) FROM raw.epub_metadata").fetchone()[0]
-    logging.info("Loaded raw.epub_metadata (%s rows)", row_count)
-
-    conn.close()
+    with open_warehouse() as conn, transaction(conn):
+        conn.execute("CREATE SCHEMA IF NOT EXISTS raw")
+        conn.execute(
+            "CREATE OR REPLACE TABLE raw.epub_metadata AS SELECT * FROM read_json(?)",
+            [str(output_path)],
+        )
+        log_row_count(conn, "raw", "epub_metadata")
 
 
 def main():

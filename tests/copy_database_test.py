@@ -14,6 +14,15 @@ def test_copy_keeps_every_row(fake_koreader_db, tmp_path):
     conn.close()
 
 
+def test_copy_creates_missing_output_dir(fake_koreader_db, tmp_path):
+    """A fresh clone has no data/raw/: the copy must create it."""
+    dest = tmp_path / "data" / "raw" / "copy.sqlite3"
+
+    copy_data_db(fake_koreader_db, dest)
+
+    assert dest.exists()
+
+
 def test_main_fails_when_ereader_missing(monkeypatch, tmp_path):
     monkeypatch.setattr("extract.copy_database.koreader_settings_dir", lambda: tmp_path / "missing")
     assert main() == 1
