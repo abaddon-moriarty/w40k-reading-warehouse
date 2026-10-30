@@ -67,6 +67,7 @@ find /path/to/ereader -name statistics.sqlite3
 ```bash
 uv run python -m extract.copy_database   # copy the KOReader database and load it into raw_koreader
 uv run python -m extract.book_list       # read the metadata of every EPUB and load it into raw.epub_metadata
+uv run python -m extract.wiki_export     # read every wiki.gg XML export and load raw.wiki_pages and raw.wiki_page_categories
 uv run pytest                            # run the tests
 duckdb -ui data/warehouse.duckdb         # explore the warehouse in the browser
 ```
