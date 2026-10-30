@@ -1,5 +1,6 @@
 import logging
 import re
+import sys
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
@@ -38,17 +39,28 @@ def extraction_from_xml(xml_file):
 
 
 def main():
-    file_name = "Eisenhorn_Novel_Series).xml"
-    input_path = Path(XML_SOURCE, file_name)
-    logging.debug(input_path)
-    output_path = Path(XML_SOURCE, file_name).with_suffix(".jsonl")
-    logging.debug(output_path)
-    rows = extraction_from_xml(input_path)
-    write_jsonl(rows, output_path, key="source_file")
-    load_jsonl(output_path, "raw", "wiki_pages")
+    if not XML_SOURCE:
+        logging.error("XML_SOURCE is not configured")
+        return 1
+
+    try:
+        file_name = "Eisenhorn_Novel_Series).xml"
+        input_path = Path(XML_SOURCE, file_name)
+        logging.debug(input_path)
+        input_path.resolve(strict=True)
+
+        output_path = input_path.with_suffix(".jsonl")
+        logging.debug(output_path)
+        rows = extraction_from_xml(input_path)
+        write_jsonl(rows, output_path, key="source_file")
+        load_jsonl(output_path, "raw", "wiki_pages")
+    except FileNotFoundError:
+        logging.exception("Path does not exist. Make sure the XML_SOURCE in your .env is correct.")
+        return 1
+    return 0
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
 
-    main()
+    sys.exit(main())
