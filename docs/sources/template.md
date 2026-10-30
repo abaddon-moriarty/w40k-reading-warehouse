@@ -14,6 +14,7 @@ Mode d'emploi
 -->
 
 > **Métadonnées de la fiche**
+>
 > - Rédacteur :
 > - Date de création / dernière mise à jour :
 > - Version :
@@ -22,8 +23,9 @@ Mode d'emploi
 > - Décision : retenue | écartée | en attente : <!-- une phrase : pourquoi -->
 
 ## 1. Identité
+
 | Champ | Valeur | Vérification |
-|---|---|---|
+| --- | --- | --- |
 | Nom | | |
 | Identifiant unique | <!-- slug, nom technique, identifiant renvoyé par le système --> | |
 | Type de source | <!-- base opérationnelle, API, fichier, site web, open data, saisie manuelle --> | |
@@ -33,8 +35,9 @@ Mode d'emploi
 | Langue(s) | | |
 
 ## 2. Accès et format
+
 | Champ | Valeur | Vérification |
-|---|---|---|
+| --- | --- | --- |
 | Système / plateforme | <!-- logiciel et version --> | |
 | Format natif | <!-- tables SQL, JSON, CSV, XML, HTML… --> | |
 | Points d'accès disponibles | <!-- API (endpoint), export, dump, sitemap, fichier, connexion directe --> | |
@@ -46,8 +49,9 @@ Mode d'emploi
 | Emplacement de la copie locale | <!-- ex. data/raw/<source>/ --> | |
 
 ## 3. Structure et clés
+
 | Champ | Valeur | Vérification |
-|---|---|---|
+| --- | --- | --- |
 | Grain | <!-- que représente une ligne / un enregistrement --> | |
 | Objets ou tables utiles | | |
 | Clés disponibles | <!-- naturelles, techniques ; stables ou non --> | |
@@ -56,8 +60,9 @@ Mode d'emploi
 | Dictionnaire ou documentation | <!-- lien, ou « absent » --> | |
 
 ## 4. Provenance et propriété
+
 | Champ | Valeur | Vérification |
-|---|---|---|
+| --- | --- | --- |
 | Système producteur | <!-- qui ou quoi crée la donnée, et pourquoi --> | |
 | Processus de saisie | <!-- qui saisit, avec quelle incitation : conditionne la fiabilité --> | |
 | Date de création de la source | | |
@@ -66,8 +71,9 @@ Mode d'emploi
 | Contact | | |
 
 ## 5. Volumétrie et fraîcheur
+
 | Champ | Valeur | Vérification |
-|---|---|---|
+| --- | --- | --- |
 | Volumétrie | <!-- nombre d'enregistrements utiles, avec la date --> | |
 | Profondeur d'historique | | |
 | Fréquence de mise à jour de la source | | |
@@ -76,8 +82,9 @@ Mode d'emploi
 | Activité / maintenance | <!-- la source est-elle encore entretenue ? --> | |
 
 ## 6. Couverture
+
 | Champ | Valeur | Vérification |
-|---|---|---|
+| --- | --- | --- |
 | Population couverte | <!-- qui ou quoi est dedans ; qui ou quoi n'y est pas --> | |
 | Période couverte | | |
 | Champs utiles et leur taux de remplissage | <!-- renvoyer au profilage --> | |
@@ -86,7 +93,7 @@ Mode d'emploi
 ## 7. Qualité
 <!-- Une ligne par dimension. « À mesurer » tant que le profilage n'est pas fait. -->
 | Dimension | Constat | Vérification |
-|---|---|---|
+| --- | --- | --- |
 | Complétude des valeurs | | |
 | Complétude de la population | | |
 | Exactitude | | |
@@ -97,8 +104,9 @@ Mode d'emploi
 | Risques connus | | |
 
 ## 8. Gouvernance et conformité
+
 | Champ | Valeur | Vérification |
-|---|---|---|
+| --- | --- | --- |
 | Données personnelles présentes dans la source | | |
 | Données personnelles collectées par le projet | <!-- lesquelles, ou « aucune » --> | |
 | Base légale et finalité (si données personnelles) | | |
@@ -110,8 +118,9 @@ Mode d'emploi
 | Redistribution | <!-- ce qui sort du projet, ou « aucune » --> | |
 
 ## 9. Lineage
+
 | Champ | Valeur |
-|---|---|
+| --- | --- |
 | Sources amont | <!-- d'où la source tire elle-même ses données --> |
 | Extraction | <!-- script, commande, ou procédure manuelle --> |
 | Tables raw | |
@@ -119,11 +128,13 @@ Mode d'emploi
 | Destinations aval | <!-- modèles, tables finales, usages --> |
 
 ## 10. Décisions et questions ouvertes
+
 | Date | Décision ou question | Statut |
-|---|---|---|
+| --- | --- | --- |
 | | | |
 
 ## Historique de la fiche
+
 | Version | Date | Modification |
-|---|---|---|
+| --- | --- | --- |
 | 1 | | Création |
