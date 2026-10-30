@@ -29,7 +29,7 @@ hand-kept seeds (data/seeds/) ───────┘
 | KOReader reading statistics | `extract/copy_database.py` | `data/raw/koreader_db.sqlite3` | `raw_koreader.book`, `raw_koreader.page_stat_data`, `raw_koreader.numbers`, `raw_koreader.sqlite_sequence` | Done |
 | EPUB metadata (OPF) | `extract/book_list.py` | `data/raw/epub_metadata.jsonl` | `raw.epub_metadata` | Done |
 | Reading status (finished) | *(to do)* | KOReader `.sdr` metadata | *(to do)* | To do |
-| Entity names (wiki.gg) | *(to do)* | `data/raw/wiki_gg/*.xml`, exported by hand | `raw.wiki_pages`, `raw.wiki_page_categories` | To do |
+| Entity names (wiki.gg) | `extract/wiki_export.py` | `data/raw/wiki_gg/*.xml`, exported by hand | `raw.wiki_pages`, `raw.wiki_page_categories` | Done |
 | Hand-kept seeds | `dbt seed` | `data/seeds/*.csv` (local; invented examples in `dbt/seeds_example/`) | `wiki_exports`, `category_type_map`, `entity_alias`, `lexicon_exclusions`, `coverage_check`, `book_mapping` | To do |
 | EPUB tables of contents | *(to do)* | | | V2 |
 
