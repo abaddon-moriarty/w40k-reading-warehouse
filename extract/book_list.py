@@ -5,10 +5,9 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 from zipfile import BadZipFile, ZipFile
 
-import duckdb
-
+from extract.common.warehouse import log_row_count, open_warehouse, transaction
 from extract.common.xml_ns import get_local_name, get_namespace
-from extract.config import EREADER_ROOT, RAW_DIR, W40K_FOLDER, WAREHOUSE_PATH
+from extract.config import EREADER_ROOT, RAW_DIR, W40K_FOLDER
 
 OPF_NS = {
     "opf": "http://www.idpf.org/2007/opf",
@@ -111,17 +110,13 @@ def write_jsonl(rows, path):
 
 
 def upload_metadata_to_warehouse(output_path):
-    conn = duckdb.connect(str(WAREHOUSE_PATH), config={"storage_compatibility_version": "v1.5.0"})
-
-    conn.execute("CREATE SCHEMA IF NOT EXISTS raw")
-    conn.execute(
-        f"""CREATE OR REPLACE TABLE raw.epub_metadata AS
-            SELECT * FROM read_json('{output_path}');"""
-    )
-    row_count = conn.execute("SELECT COUNT(*) FROM raw.epub_metadata").fetchone()[0]
-    logging.info("Loaded raw.epub_metadata (%s rows)", row_count)
-
-    conn.close()
+    with open_warehouse() as conn, transaction(conn):
+        conn.execute("CREATE SCHEMA IF NOT EXISTS raw")
+        conn.execute(
+            "CREATE OR REPLACE TABLE raw.epub_metadata AS SELECT * FROM read_json(?)",
+            [str(output_path)],
+        )
+        log_row_count(conn, "raw", "epub_metadata")
 
 
 def main():
